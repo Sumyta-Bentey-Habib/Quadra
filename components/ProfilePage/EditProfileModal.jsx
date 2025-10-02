@@ -130,3 +130,4 @@ const EditProfileModal = ({ user }) => {
 };
 
 export default EditProfileModal;
+
