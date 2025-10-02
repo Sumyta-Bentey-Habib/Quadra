@@ -8,18 +8,20 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogIn } from "lucide-react";
+import { ThemeToggler } from "@/components/Theme/ThemeToggler";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleLoginSuccess = (email) => {
-    
-    console.log("Logged in:", email);
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl grid md:grid-cols-2">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl grid md:grid-cols-2 relative">
+        
+        {/* Theme Toggle  */}
+        <div className="absolute top-4 right-4">
+          <ThemeToggler />
+        </div>
+
         {/* Lottie Animation */}
         <div className="hidden md:flex items-center justify-center p-6">
           <Lottie animationData={loginAnimation} loop={true} />
@@ -29,13 +31,12 @@ export default function LoginPage() {
         <div className="flex flex-col justify-center gap-4 p-6 md:p-10">
           <h1 className="text-2xl font-bold text-center mb-4">Login</h1>
 
-          <LoginForm mode="signin" onSuccess={handleLoginSuccess} />
+          <LoginForm mode="signin" />
 
-          {/* Links */}
           <div className="flex justify-between mt-4">
             <p className="text-sm">
               Don’t have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline">
+              <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Register
               </Link>
             </p>
