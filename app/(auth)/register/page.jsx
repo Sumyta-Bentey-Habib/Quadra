@@ -1,0 +1,57 @@
+"use client";
+
+import React from "react";
+import LoginForm from "@/components/forms/LoginForm"; // same form used for signup mode
+import Lottie from "lottie-react";
+import registerAnimation from "@/components/lottie/register.json"; // make sure you have this
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { LogIn } from "lucide-react";
+import { ThemeToggler } from "@/components/Theme/ThemeToggler";
+
+export default function RegisterPage() {
+  const router = useRouter();
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl grid md:grid-cols-2 relative">
+
+        {/* Theme Toggle (top-right) */}
+        <div className="absolute top-4 right-4">
+          <ThemeToggler />
+        </div>
+
+        {/* Lottie Animation */}
+        <div className="hidden md:flex items-center justify-center p-6">
+          <Lottie animationData={registerAnimation} loop={true} />
+        </div>
+
+        {/* Register Form */}
+        <div className="flex flex-col justify-center gap-4 p-6 md:p-10">
+          <h1 className="text-2xl font-bold text-center mb-4">Register</h1>
+
+          <LoginForm mode="signup" />
+
+          <div className="flex justify-between mt-4">
+            <p className="text-sm">
+              Already have an account?{" "}
+              <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
+                Login
+              </Link>
+            </p>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/")}
+              className="text-sm flex items-center gap-1"
+            >
+              <LogIn className="w-4 h-4" /> Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
