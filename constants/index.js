@@ -6,6 +6,7 @@ export const sidebarLinks = [
 		route: ROUTES.HOME,
 		label: "Home",
 		icon: Home,
+		
 	},
 	{
 		route: ROUTES.EXPLORE,

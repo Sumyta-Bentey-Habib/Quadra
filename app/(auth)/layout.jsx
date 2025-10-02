@@ -1,9 +1,13 @@
+"use client"; 
+
+import { SessionProvider } from "next-auth/react";
+
 const AuthLayout = ({ children }) => {
-	return (
-		<>
-			<main>{children}</main>
-		</>
-	);
+  return (
+    <SessionProvider>
+      <main>{children}</main>
+    </SessionProvider>
+  );
 };
 
 export default AuthLayout;
