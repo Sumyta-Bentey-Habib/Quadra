@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { useAlertDialog } from "@/components/hooks/use-alert-dialog";
 
-// Validation schema
 const formSchema = z.object({
   name: z.string().optional(),
   email: z.string().email({ message: "Enter a valid email" }),
@@ -87,47 +86,45 @@ export default function LoginForm({ mode }) {
 
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md mx-auto">
         {mode === "signup" && (
           <div>
-            <Input placeholder="Name" {...form.register("name")} />
+            <Input placeholder="Name" {...form.register("name")} className="w-full" />
             {form.formState.errors.name && (
-              <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>
+              <p className="text-red-500 text-sm mt-1">{form.formState.errors.name.message}</p>
             )}
           </div>
         )}
 
         <div>
-          <Input placeholder="Email" {...form.register("email")} />
+          <Input placeholder="Email" {...form.register("email")} className="w-full" />
           {form.formState.errors.email && (
-            <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>
+            <p className="text-red-500 text-sm mt-1">{form.formState.errors.email.message}</p>
           )}
         </div>
 
         <div>
-          <Input type="password" placeholder="Password" {...form.register("password")} />
+          <Input type="password" placeholder="Password" {...form.register("password")} className="w-full" />
           {form.formState.errors.password && (
-            <p className="text-red-500 text-sm">{form.formState.errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">{form.formState.errors.password.message}</p>
           )}
         </div>
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full py-2">
           {mode === "signup" ? "Sign Up" : "Sign In"}
         </Button>
 
-        {mode === "signin" && (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 mt-2"
-            onClick={handleGoogleLogin}
-          >
-            <LogIn className="w-5 h-5" /> Continue with Google
-          </Button>
-        )}
+        {/* Google Login always visible */}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2 mt-2 py-2"
+          onClick={handleGoogleLogin}
+        >
+          <LogIn className="w-5 h-5" /> Continue with Google
+        </Button>
       </form>
 
-    
       {AlertDialogUI}
     </>
   );
