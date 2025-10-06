@@ -1,5 +1,4 @@
 import ConversationList from "@/components/navigation/sidebar/ConversationList";
-import React from "react";
 
 const MessagesPage = () => {
 	return (
