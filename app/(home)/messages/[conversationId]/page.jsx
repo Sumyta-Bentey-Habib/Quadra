@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function ConversationPage({ params }) {
 	const session = await getServerSession(authOptions);
@@ -18,19 +19,24 @@ export default async function ConversationPage({ params }) {
 	const messages = await messagesRes.json();
 
 	return (
-		<div className='flex flex-col h-screen'>
+		<div className='flex flex-col max-h-screen overflow-y-auto'>
 			{/* Header */}
-			<header className='p-4 border-b bg-muted/50 flex items-center justify-between'>
+			<header className='p-4 border-b bg-muted/50 flex items-center gap-4'>
+				<div>
+					<Avatar className='ml-2'>
+						<AvatarImage src={conversation.participantDetails[1]?.image} />
+						<AvatarFallback>{conversation.participantDetails[1]?.name[0]}</AvatarFallback>
+					</Avatar>
+				</div>
 				<div>
 					<h2 className='font-semibold text-lg'>
-						{conversation.isGroup ? conversation.groupName : conversation.participantDetails?.name}
+						{conversation.isGroup ? conversation.groupName : conversation.participantDetails[1]?.name}
 					</h2>
 					<p className='text-sm text-muted-foreground'>
 						{conversation.isGroup ? `${conversation.participants.length} members` : "Direct Message"}
 					</p>
 				</div>
 			</header>
-
 			{/* Messages List */}
 			<MessageList
 				messages={messages}
