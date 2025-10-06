@@ -1,34 +1,48 @@
-"use client";
-import { useParams, useRouter } from "next/navigation";
-import ChatWindow from "@/components/chat/ChatWindow";
-import { dummyConversations, dummyMessages } from "@/data/conversations";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import MessageList from "@/components/chat/MessageList";
+import MessageInput from "@/components/chat/MessageInput";
 
-const ConversationPage = () => {
-  const { conversationId } = useParams();
-  const router = useRouter();
-  const convId = Number(conversationId);
+export default async function ConversationPage({ params }) {
+	const session = await getServerSession(authOptions);
+	const userId = session?.user?.id;
+	const conversationId = (await params).conversationId;
 
-  const conversation = dummyConversations.find((c) => c.id === convId);
+	// Fetch conversation details + messages
+	const [conversationRes, messagesRes] = await Promise.all([
+		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/${conversationId}`, { cache: "no-store" }),
+		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/messages/${conversationId}`, { cache: "no-store" }),
+	]);
 
-  if (!conversation) {
-    return (
-      <div className="flex justify-center items-center h-full text-gray-500">
-        Conversation not found
-      </div>
-    );
-  }
+	const conversation = await conversationRes.json();
+	const messages = await messagesRes.json();
 
-  const handleBack = () => {
-    router.push("/messages");
-  };
+	return (
+		<div className='flex flex-col h-screen'>
+			{/* Header */}
+			<header className='p-4 border-b bg-muted/50 flex items-center justify-between'>
+				<div>
+					<h2 className='font-semibold text-lg'>
+						{conversation.isGroup ? conversation.groupName : conversation.participantDetails?.name}
+					</h2>
+					<p className='text-sm text-muted-foreground'>
+						{conversation.isGroup ? `${conversation.participants.length} members` : "Direct Message"}
+					</p>
+				</div>
+			</header>
 
-  return (
-    <ChatWindow
-      messages={dummyMessages[convId]}
-      user={conversation.user}
-      onBack={handleBack}
-    />
-  );
-};
+			{/* Messages List */}
+			<MessageList
+				messages={messages}
+				currentUserId={userId}
+				conversationId={conversationId}
+			/>
 
-export default ConversationPage;
+			{/* Message Input */}
+			<MessageInput
+				conversationId={conversationId}
+				senderId={userId}
+			/>
+		</div>
+	);
+}
