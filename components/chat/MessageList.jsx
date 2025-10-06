@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { socket } from "@/lib/socket";
@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react";
 
 export default function MessageList({ messages: initialMessages, currentUserId, conversationId }) {
 	const [messages, setMessages] = useState(initialMessages);
-	const bottomRef = useRef(null);
 	const session = useSession();
 	const user = session?.data?.user;
 
@@ -23,16 +22,11 @@ export default function MessageList({ messages: initialMessages, currentUserId, 
 		};
 	}, [conversationId]);
 
-	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
-
 	return (
-		<ScrollArea className='flex-1 px-4 py-2'>
+		<ScrollArea className='flex-1 px-4 py-2 h-90vh'>
 			<div className='space-y-4'>
 				{messages.map((msg) => {
 					const isOwn = msg.senderId === currentUserId;
-                    console.log(msg);
 					return (
 						<div
 							key={msg._id}
@@ -63,7 +57,6 @@ export default function MessageList({ messages: initialMessages, currentUserId, 
 						</div>
 					);
 				})}
-				<div ref={bottomRef} />
 			</div>
 		</ScrollArea>
 	);
