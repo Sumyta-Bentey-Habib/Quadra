@@ -1,11 +1,22 @@
 import ConversationList from "@/components/navigation/sidebar/ConversationList";
+import { authOptions } from "@/lib/authOptions";
+import { getServerSession } from "next-auth";
 
-const MessagesLayout = ({ children }) => {
+const MessagesLayout = async ({ children }) => {
+	const session = await getServerSession(authOptions);
+	const userId = session?.user?.id;
+
+	const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/user/${userId}`, { cache: "no-store" });
+	const conversations = await res.json();
+
 	return (
 		<div className='flex h-screen'>
 			{/* Sidebar */}
 			<div className='bg-background border-r overflow-y-auto md:w-1/3 w-full hidden md:block'>
-				<ConversationList />
+				<ConversationList
+					conversations={conversations}
+					currentUserId={userId}
+				/>
 			</div>
 
 			{/* Chat window */}
