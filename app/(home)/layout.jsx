@@ -1,27 +1,55 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { SessionProvider } from "next-auth/react";
+import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "@/components/navigation/navbar/Navbar";
 import LeftSidebar from "@/components/navigation/sidebar/LeftSidebar";
 import RightSidebar from "@/components/navigation/sidebar/RightSidebar";
+import CoverPage from "@/components/coverpage/Coverpage";
 
 const HomeLayout = ({ children }) => {
-	return (
-		<SessionProvider>
-			<header>
-				<Navbar />
-			</header>
-			<main className='flex relative'>
-				<LeftSidebar />
-				<section className='flex min-h-screen flex-1 flex-col max-md:pb-14'>
-					<div className='w-full'>{children}</div>
-				</section>
-				<RightSidebar />
-			</main>
-			<footer />
-		</SessionProvider>
-	);
+  const [started, setStarted] = useState(false);
+
+  return (
+    <SessionProvider>
+      <AnimatePresence mode="wait">
+        {!started ? (
+          <motion.div
+            key="cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[999] w-full h-full"
+          >
+            <CoverPage onGetStarted={() => setStarted(true)} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col min-h-screen"
+          >
+            <header>
+              <Navbar />
+            </header>
+            <main className="flex relative flex-1">
+              <LeftSidebar />
+              <section className="flex min-h-screen flex-1 flex-col max-md:pb-14">
+                <div className="w-full">{children}</div>
+              </section>
+              <RightSidebar />
+            </main>
+            <footer />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </SessionProvider>
+  );
 };
 
 export default HomeLayout;
