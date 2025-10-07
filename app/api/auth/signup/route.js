@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, photoUrl } = await req.json();
 
     const users = await dbconnect("users");
     const existing = await users.findOne({ email });
@@ -12,12 +12,13 @@ export async function POST(req) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const hashed = password ? await bcrypt.hash(password, 10) : null;
 
     await users.insertOne({
       name,
       email,
       password: hashed,
+      photoUrl: photoUrl || null,
       createdAt: new Date(),
     });
 
