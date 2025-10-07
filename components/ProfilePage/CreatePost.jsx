@@ -87,7 +87,7 @@ const CreatePost = ({ user }) => {
       const newPost = {
         userId: us?.id, 
         userName: us?.name || "Anonymous",
-        avatar: us?.image || "https://res.cloudinary.com/dv6p7mprd/image/upload/v1752430406/istockphoto-1477583621-612x612_x1gcca.jpg",
+        avatar: us?.image || "https://res.cloudinary.com/dizstnwr7/image/upload/v1759867578/profile_photos/aoizjrhbuerkt3o8gzdp.png",
         text,
         images: uploadedImageUrls,
       };
@@ -128,7 +128,7 @@ const CreatePost = ({ user }) => {
       {/* Post Input */}
       <div className="flex items-start gap-3 sm:gap-4">
         <img
-          src={user.photoUrl || "https://i.pravatar.cc/150"}
+          src={user.photoUrl || "https://res.cloudinary.com/dizstnwr7/image/upload/v1759867578/profile_photos/aoizjrhbuerkt3o8gzdp.png"}
           alt="avatar"
           className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover mt-1 border border-gray-200 dark:border-gray-600"
         />

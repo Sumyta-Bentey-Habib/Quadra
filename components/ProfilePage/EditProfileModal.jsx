@@ -16,6 +16,7 @@ import {
 
 const EditProfileModal = ({ user }) => {
   const [preview, setPreview] = useState(user.photoUrl || "https://i.pravatar.cc/150");
+  const [bio, setBio] = useState(user.bio || "");
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -25,22 +26,34 @@ const EditProfileModal = ({ user }) => {
     }
   };
 
+  const countWords = (text) => {
+    return text.trim().split(/\s+/).filter(Boolean).length;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
 
     const name = form.fullName.value;
-    // const password = form.password.value; // optional
+    const twitter = form.twitter.value;
+    const linkedin = form.linkedin.value;
+    const portfolio = form.portfolio.value;
+
+    // Word limit check for bio
+    if (countWords(bio) > 50) {
+      alert("Bio cannot exceed 50 words.");
+      return;
+    }
+
     const photoFile = form.photo?.files[0];
+    let photoUrl = user.photoUrl;
 
-    let photoUrl = user.photoUrl; // default to existing photo
-
-    // Upload image to Cloudinary if a new file is selected
+    // Upload image to Cloudinary if new file is selected
     if (photoFile) {
       const formData = new FormData();
       formData.append("file", photoFile);
-      formData.append("upload_preset", "project_quadra"); // Cloudinary preset
-      formData.append("folder", "profile_photos"); // optional folder
+      formData.append("upload_preset", "project_quadra");
+      formData.append("folder", "profile_photos");
 
       try {
         const res = await fetch("https://api.cloudinary.com/v1_1/dizstnwr7/image/upload", {
@@ -48,7 +61,7 @@ const EditProfileModal = ({ user }) => {
           body: formData,
         });
         const data = await res.json();
-        photoUrl = data.secure_url; // Cloudinary image URL
+        photoUrl = data.secure_url;
       } catch (error) {
         console.error("Cloudinary upload failed:", error);
         alert("Image upload failed");
@@ -56,19 +69,18 @@ const EditProfileModal = ({ user }) => {
       }
     }
 
-    // Update user in backend
+    // Update user info in backend
     try {
       const res = await fetch(`http://localhost:5000/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, photoUrl }),  // password
+        body: JSON.stringify({ name, photoUrl, bio, twitter, linkedin, portfolio }),
       });
 
       if (res.ok) {
         alert("Profile updated successfully!");
-        window.location.reload(); // reload to reflect changes
+        window.location.reload();
       } else {
-        console.error("Failed to update profile");
         alert("Update failed");
       }
     } catch (error) {
@@ -119,7 +131,7 @@ const EditProfileModal = ({ user }) => {
             </div>
           </div>
 
-          {/* Name Input */}
+          {/* Full Name */}
           <input
             type="text"
             name="fullName"
@@ -128,21 +140,56 @@ const EditProfileModal = ({ user }) => {
             className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
           />
 
-          {/* Password Input */}
+          {/* Bio */}
+          <div>
+            <textarea
+              name="bio"
+              placeholder="Write something about yourself (max 50 words)..."
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              rows={3}
+              className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+            />
+            <p className={`text-sm mt-1 ${countWords(bio) > 50 ? "text-red-500" : "text-gray-500"}`}>
+              {countWords(bio)} / 50 words
+            </p>
+          </div>
+
+          {/* Twitter */}
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
+            type="url"
+            name="twitter"
+            placeholder="Twitter / X Profile URL"
+            defaultValue={user.twitter || ""}
             className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
           />
 
+          {/* LinkedIn */}
+          <input
+            type="url"
+            name="linkedin"
+            placeholder="LinkedIn Profile URL"
+            defaultValue={user.linkedin || ""}
+            className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+          />
+
+          {/* Portfolio */}
+          <input
+            type="url"
+            name="portfolio"
+            placeholder="Portfolio URL"
+            defaultValue={user.portfolio || ""}
+            className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+          />
+
+          {/* Buttons */}
           <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <DialogClose asChild>
-              <Button size="sm" variant="outline">
+              <Button className="cursor-pointer" size="sm" variant="outline">
                 Cancel
               </Button>
             </DialogClose>
-            <Button size="sm" type="submit">
+            <Button className="cursor-pointer" size="sm" type="submit">
               Save
             </Button>
           </DialogFooter>
