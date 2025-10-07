@@ -12,6 +12,7 @@ import { LogIn, LogOut } from "lucide-react";
 const NavLinks = ({ isMobileNav = false }) => {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const userId = session?.user?.id;
 
   return (
     <nav
@@ -26,7 +27,7 @@ const NavLinks = ({ isMobileNav = false }) => {
           pathname === item.route;
 
         if (item.route === "/profile") {
-          item.route = `${item.route}/1`; // mock profile
+          item.route = `${item.route}/${userId}`; // mock profile
         }
 
         return (
