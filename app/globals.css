@@ -120,3 +120,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+
+/* animation for the cover page */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes float-slow {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float-slower {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes float-fast {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite alternate; }
+.animate-float-slower { animation: float-slower 7s ease-in-out infinite alternate; }
+.animate-float-fast { animation: float-fast 5s ease-in-out infinite alternate; }
+
+.animate-bounce-slow { animation: bounce 2s infinite; }
+.animate-bounce-slower { animation: bounce 2.5s infinite; }
+.animate-bounce-fast { animation: bounce 1.5s infinite; }
+
