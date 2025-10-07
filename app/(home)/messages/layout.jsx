@@ -12,7 +12,7 @@ const MessagesLayout = async ({ children }) => {
 	return (
 		<div className='flex h-screen'>
 			{/* Sidebar */}
-			<div className='bg-background border-r overflow-y-auto md:w-1/3 w-full hidden md:block'>
+			<div className='bg-background border-r overflow-y-auto no-scrollbar md:w-1/3 w-full hidden md:block'>
 				<ConversationList
 					conversations={conversations}
 					currentUserId={userId}
