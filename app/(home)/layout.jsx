@@ -48,6 +48,7 @@ const HomeLayout = ({ children }) => {
           </motion.div>
         )}
       </AnimatePresence>
+	  
     </SessionProvider>
   );
 };
