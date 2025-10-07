@@ -7,23 +7,27 @@ export async function POST(req) {
     const { name, email, password, photoUrl } = await req.json();
 
     const users = await dbconnect("users");
+
+    // Check if user already exists
     const existing = await users.findOne({ email });
     if (existing) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
-    const hashed = password ? await bcrypt.hash(password, 10) : null;
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await users.insertOne({
+    const result = await users.insertOne({
       name,
       email,
-      password: hashed,
+      password: hashedPassword,
       photoUrl: photoUrl || null,
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, userId: result.insertedId });
   } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
