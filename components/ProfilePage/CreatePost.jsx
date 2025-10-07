@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 import React, { useState, useRef } from "react";
 import { Image, Video, Music, X, ShieldAlert } from "lucide-react";
@@ -11,11 +11,38 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
+import { useSession } from "next-auth/react";
+
+// Cloudinary Image Upload 
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "project_quadra");
+
+  const res = await fetch("https://api.cloudinary.com/v1_1/dizstnwr7/image/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    throw new Error("Image should be within 2MB");
+  }
+
+  const data = await res.json();
+  return data.secure_url;
+};
 
 const CreatePost = ({ user }) => {
   const [selectedImages, setSelectedImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Getting current user data
+  const { data: session } = useSession();
+  const us = session?.user;
+  
+  
 
   const openFilePicker = () => {
     fileInputRef.current?.click();
@@ -31,21 +58,67 @@ const CreatePost = ({ user }) => {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  // Handle Submit with Cloudinary 
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
+    const text = form.postText.value.trim();
 
-    const text = form.postText.value;
+    if (!text && selectedImages.length === 0) {
+      Swal.fire({
+        position: "top-end",
+        icon: "warning",
+        title: "Please add text or an image before posting.",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
 
-    console.log({
-      text,
-      images: selectedImages,
-    });
+    setIsSubmitting(true);
 
-    // Clear form
-    form.reset();
-    setSelectedImages([]);
+    try {
+      const uploadedImageUrls = [];
+      for (const file of selectedImages) {
+        const imageUrl = await uploadToCloudinary(file);
+        uploadedImageUrls.push(imageUrl);
+      }
+
+      const newPost = {
+        userId: us?.id, 
+        userName: us?.name || "Anonymous",
+        avatar: us?.image || "https://res.cloudinary.com/dv6p7mprd/image/upload/v1752430406/istockphoto-1477583621-612x612_x1gcca.jpg",
+        text,
+        images: uploadedImageUrls,
+      };
+
+      // Send to backend
+      const res = await fetch("http://localhost:5000/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPost),
+      });
+
+      console.log(newPost);
+      
+
+      if (!res.ok) throw new Error("Failed to create post");
+
+      const createdPost = await res.json();
+      console.log("Post created:", createdPost);
+
+      // Clear form
+      form.reset();
+      setSelectedImages([]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <form
@@ -61,6 +134,7 @@ const CreatePost = ({ user }) => {
         />
         <textarea
           name="postText"
+          required
           placeholder="Share your thoughts..."
           className="w-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 focus:border-gray-500 dark:focus:border-gray-400 text-gray-800 dark:text-gray-200 rounded-lg p-2 sm:p-3 text-sm sm:text-base focus:outline-none resize-none"
           rows={3}
@@ -70,7 +144,7 @@ const CreatePost = ({ user }) => {
       {/* Media Buttons */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 pl-12 sm:pl-16 gap-3 sm:gap-0">
         <div className="flex gap-3 sm:gap-4 text-gray-500 dark:text-gray-400 flex-wrap">
-          {/* Photo button */}
+          {/* Photo Button */}
           <button
             type="button"
             onClick={openFilePicker}
@@ -93,13 +167,11 @@ const CreatePost = ({ user }) => {
                 </DialogTitle>
               </DialogHeader>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                The Video upload feature is currently under construction. Stay tuned!
+                The video upload feature is currently under construction. Stay tuned!
               </p>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button
-                    className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  >
+                  <Button className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
                     Close
                   </Button>
                 </DialogClose>
@@ -121,13 +193,11 @@ const CreatePost = ({ user }) => {
                 </DialogTitle>
               </DialogHeader>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                The Sound upload feature is currently under construction. Stay tuned!
+                The sound upload feature is currently under construction. Stay tuned!
               </p>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button
-                    className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  >
+                  <Button className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
                     Close
                   </Button>
                 </DialogClose>
@@ -147,13 +217,18 @@ const CreatePost = ({ user }) => {
 
         <button
           type="submit"
-          className="bg-gradient-to-r from-gray-700 via-gray-500 to-gray-400 border border-gray-300 dark:border-gray-600 hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer text-white font-semibold px-4 sm:px-6 py-2 rounded-lg"
+          disabled={isSubmitting}
+          className={`cursor-pointer ${
+            isSubmitting
+              ? "bg-gray-400 cursor-wait"
+              : "bg-gradient-to-r from-gray-700 via-gray-500 to-gray-400 hover:scale-105 hover:shadow-md"
+          } border border-gray-300 dark:border-gray-600 transition-all duration-300 text-white font-semibold px-4 sm:px-6 py-2 rounded-lg`}
         >
-          Post
+          {isSubmitting ? "Posting..." : "Post"}
         </button>
       </div>
 
-      {/* Live Post Preview */}
+      {/* Live Preview */}
       {selectedImages.length > 0 && (
         <div className="mt-4 flex flex-col gap-4">
           {selectedImages.map((file, idx) => (
