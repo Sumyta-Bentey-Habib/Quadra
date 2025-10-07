@@ -128,7 +128,7 @@ const CreatePost = ({ user }) => {
       {/* Post Input */}
       <div className="flex items-start gap-3 sm:gap-4">
         <img
-          src={user.avatar}
+          src={user.photoUrl || "https://i.pravatar.cc/150"}
           alt="avatar"
           className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover mt-1 border border-gray-200 dark:border-gray-600"
         />
