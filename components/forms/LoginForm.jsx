@@ -10,40 +10,87 @@ import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { useAlertDialog } from "@/components/hooks/use-alert-dialog";
 
-const formSchema = z.object({
-  email: z.string().email({ message: "Enter a valid email" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-});
-
-export default function LoginForm() {
+export default function LoginForm({ mode = "login" }) {
   const router = useRouter();
+
+  // Form schema depending on mode
+  const formSchema =
+    mode === "signup"
+      ? z.object({
+          name: z.string().min(1, { message: "Name is required" }),
+          email: z.string().email({ message: "Enter a valid email" }),
+          password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+          photoUrl: z.string().optional(),
+        })
+      : z.object({
+          email: z.string().email({ message: "Enter a valid email" }),
+          password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+        });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues:
+      mode === "signup"
+        ? { name: "", email: "", password: "", photoUrl: "" }
+        : { email: "", password: "" },
   });
 
   const { showAlert, AlertDialogUI } = useAlertDialog();
 
   async function onSubmit(values) {
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: values.email,
-      password: values.password,
-    });
+    if (mode === "login") {
+      // Login
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
 
-    if (res?.error) {
-      showAlert({
-        title: "Login Failed",
-        description: "Invalid email or password",
-        confirmText: "Try Again",
-      });
+      if (res?.error) {
+        showAlert({
+          title: "Login Failed",
+          description: "Invalid email or password",
+          confirmText: "Try Again",
+        });
+      } else {
+        showAlert({
+          title: "Logged in!",
+          description: `Welcome back, ${values.email}`,
+          confirmText: "Go Home",
+          onConfirm: () => router.push("/"),
+        });
+      }
     } else {
-      showAlert({
-        title: "Logged in!",
-        description: `Welcome back, ${values.email}`,
-        confirmText: "Go Home",
-        onConfirm: () => router.push("/"),
-      });
+      // Signup
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showAlert({
+            title: "Account Created!",
+            description: "You can now login",
+            confirmText: "Go to Login",
+            onConfirm: () => router.push("/login"),
+          });
+        } else {
+          showAlert({
+            title: "Signup Failed",
+            description: data.error || "Something went wrong",
+            confirmText: "Try Again",
+          });
+        }
+      } catch (err) {
+        showAlert({
+          title: "Signup Failed",
+          description: "Something went wrong",
+          confirmText: "Try Again",
+        });
+      }
     }
   }
 
@@ -54,6 +101,17 @@ export default function LoginForm() {
   return (
     <>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md mx-auto">
+        {/* Name field for signup */}
+        {mode === "signup" && (
+          <div>
+            <Input placeholder="Name" {...form.register("name")} className="w-full" />
+            {form.formState.errors.name && (
+              <p className="text-red-500 text-sm mt-1">{form.formState.errors.name.message}</p>
+            )}
+          </div>
+        )}
+
+        {/* Email */}
         <div>
           <Input placeholder="Email" {...form.register("email")} className="w-full" />
           {form.formState.errors.email && (
@@ -61,6 +119,7 @@ export default function LoginForm() {
           )}
         </div>
 
+        {/* Password */}
         <div>
           <Input
             type="password"
@@ -73,8 +132,19 @@ export default function LoginForm() {
           )}
         </div>
 
+        {/* Photo URL for signup */}
+        {mode === "signup" && (
+          <div>
+            <Input placeholder="Photo URL (optional)" {...form.register("photoUrl")} className="w-full" />
+            {form.formState.errors.photoUrl && (
+              <p className="text-red-500 text-sm mt-1">{form.formState.errors.photoUrl.message}</p>
+            )}
+          </div>
+        )}
+
+        {/* Submit buttons */}
         <Button type="submit" className="w-full py-2">
-          Sign In
+          {mode === "login" ? "Sign In" : "Register"}
         </Button>
 
         <Button
