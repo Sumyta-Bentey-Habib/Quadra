@@ -16,24 +16,20 @@ export default function RegisterPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl rounded-2xl grid md:grid-cols-2 relative overflow-hidden">
-
-        {/* Theme Toggle */}
         <div className="absolute top-4 right-4 z-10">
           <ThemeToggler />
         </div>
 
-        {/* Lottie Animation */}
         <div className="flex items-center justify-center p-6">
           <Lottie animationData={registerAnimation} loop className="w-full max-w-sm" />
         </div>
 
-        {/* Register Form */}
         <div className="flex flex-col justify-center gap-4 p-6 md:p-10">
           <h1 className="text-2xl md:text-3xl font-bold text-center mb-4">Register</h1>
 
           <LoginForm mode="signup" />
 
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-4 gap-3">
             <p className="text-sm text-center sm:text-left">
               Already have an account?{" "}
               <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
