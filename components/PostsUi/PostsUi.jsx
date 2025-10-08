@@ -29,6 +29,7 @@ const PostsUi = () => {
     };
     fetchPosts();
   }, [userId]);
+  console.log(userId)
 
   // Close menu on outside click
   useEffect(() => {
@@ -70,6 +71,7 @@ const PostsUi = () => {
       </div>
     );
   }
+  console.log(posts)
 
   return (
     <div className="flex flex-col gap-6">
