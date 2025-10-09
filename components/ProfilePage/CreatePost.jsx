@@ -108,7 +108,7 @@ const CreatePost = ({ user }) => {
 
       const createdPost = await res.json();
       console.log("Post created:", createdPost);
-
+      window.location.reload()
       // Clear form
       form.reset();
       setSelectedImages([]);
@@ -244,7 +244,7 @@ const CreatePost = ({ user }) => {
               <button
                 type="button"
                 onClick={() => removeImage(idx)}
-                className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                className="absolute top-2 right-2  bg-white dark:bg-gray-800 rounded-full p-1 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               >
                 <X size={16} className="text-gray-600 dark:text-gray-300" />
               </button>

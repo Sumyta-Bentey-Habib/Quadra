@@ -222,7 +222,8 @@ const ProfilePage = () => {
         <div className="lg:col-span-3 space-y-6 sm:space-y-8">
           <CreatePost user={user} />
           <div className="space-y-4">
-            <div className="flex items-center justify-end gap-2">
+            {/* Sorting */}
+            {/* <div className="flex items-center justify-end gap-2">
               <label
                 htmlFor="sort"
                 className="text-gray-600 dark:text-gray-300 font-medium text-sm"
@@ -237,7 +238,7 @@ const ProfilePage = () => {
                 <option value="popular">Most Popular</option>
                 <option value="oldest">Oldest</option>
               </select>
-            </div>
+            </div> */}
 
             <div>
               <PostsUi user={user} />
