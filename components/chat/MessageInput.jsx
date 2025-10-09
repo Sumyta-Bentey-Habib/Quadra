@@ -24,13 +24,8 @@ export default function MessageInput({ conversationId, senderId }) {
 			});
 
 			if (!res.ok) throw new Error("Failed to send message");
-
-			// Emit to socket server for real-time update
-			socket.emit("newMessage", {
-				conversationId,
-				senderId,
-				text: message,
-			});
+			await res.json();
+			
 			setMessage("");
 		} catch (error) {
 			console.error(error);

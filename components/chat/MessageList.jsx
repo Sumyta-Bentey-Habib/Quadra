@@ -62,7 +62,7 @@ export default function MessageList({ messages: initialMessages, currentUserId, 
 					</div>
 				);
 			})}
-			<div ref={scrollRef} /> 
+			<div ref={scrollRef} />
 		</div>
 	);
 }

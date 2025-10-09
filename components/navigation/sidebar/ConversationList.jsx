@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import ConversationListHeader from "@/components/chat/ConversationListHeader";
+import { socket } from "@/lib/socket";
 
 const ConversationList = ({ conversations = [], currentUserId }) => {
 	const [filteredConversations, setFilteredConversations] = useState(conversations);
@@ -24,6 +25,20 @@ const ConversationList = ({ conversations = [], currentUserId }) => {
 		});
 		setFilteredConversations(filtered);
 	};
+
+	useEffect(() => {
+		// Listen for conversation updates (last message)
+		socket.on("conversationUpdated", (update) => {
+			setFilteredConversations((prev) =>
+				prev.map((c) =>
+					c._id === update.conversationId ? { ...c, lastMessage: update.lastMessage, updatedAt: update.updatedAt } : c,
+				),
+			);
+		});
+		return () => {
+			socket.off("conversationUpdated");
+		};
+	}, []);
 
 	return (
 		<>
