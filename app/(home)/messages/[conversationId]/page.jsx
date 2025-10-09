@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import MessageHeader from "@/components/chat/MessageHeader";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default async function ConversationPage({ params }) {
 	const session = await getServerSession(authOptions);
@@ -19,31 +20,17 @@ export default async function ConversationPage({ params }) {
 	const messages = await messagesRes.json();
 
 	return (
-		<div className='flex flex-col max-h-screen overflow-y-auto'>
-			{/* Header */}
-			<header className='p-4 border-b bg-muted/50 flex items-center gap-4'>
-				<div>
-					<Avatar className='ml-2'>
-						<AvatarImage src={conversation.participantDetails[1]?.image} />
-						<AvatarFallback>{conversation.participantDetails[1]?.name[0]}</AvatarFallback>
-					</Avatar>
-				</div>
-				<div>
-					<h2 className='font-semibold text-lg'>
-						{conversation.isGroup ? conversation.groupName : conversation.participantDetails[1]?.name}
-					</h2>
-					<p className='text-sm text-muted-foreground'>
-						{conversation.isGroup ? `${conversation.participants.length} members` : "Direct Message"}
-					</p>
-				</div>
-			</header>
+		<div className='min-h-full flex flex-col'>
+			{/* Message Header */}
+			<MessageHeader conversation={conversation} />
 			{/* Messages List */}
-			<MessageList
-				messages={messages}
-				currentUserId={userId}
-				conversationId={conversationId}
-			/>
-
+			<ScrollArea className='h-[calc(100vh-150px)] px-4 py-2'>
+				<MessageList
+					messages={messages}
+					currentUserId={userId}
+					conversationId={conversationId}
+				/>
+			</ScrollArea>
 			{/* Message Input */}
 			<MessageInput
 				conversationId={conversationId}

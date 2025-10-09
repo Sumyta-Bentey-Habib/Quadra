@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Feather, Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
 
-const PostsUi = () => {
+const PostsUi = ( { user }) => {
   const [posts, setPosts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(null);
 
@@ -84,12 +84,12 @@ const PostsUi = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <img
-                src={post.avatar || "https://i.pravatar.cc/100"}
+                src={user.photoUrl || "https://res.cloudinary.com/dizstnwr7/image/upload/v1759867578/profile_photos/aoizjrhbuerkt3o8gzdp.png"}
                 alt={post.user}
                 className="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
               />
               <div>
-                <h4 className="font-semibold text-gray-800 dark:text-gray-200">{post.user}</h4>
+                <h4 className="font-semibold text-gray-800 dark:text-gray-200">{post.userName}</h4>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                   {new Date(post.createdAt).toLocaleString()}
                 </p>
