@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaRegComment,
   FaRegHeart,
@@ -43,44 +43,45 @@ const storiesData = [
   },
 ];
 
-const postsData = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    username: "@sarah_j",
-    time: "2h",
-    avatar:
-      "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=100&q=60",
-    text: "Just tried this amazing new recipe! 🍋✨ #foodie #cooking #homemade",
-    image:
-      "https://images.unsplash.com/photo-1601050690597-3b22e2a07c56?auto=format&fit=crop&w=800&q=60",
-    likes: 142,
-    comments: ["Nice post!", "Love this 😍", "Looks awesome!"],
-    shares: 8,
-  },
-  {
-    id: 2,
-    name: "Alex Designer",
-    username: "@alex_design",
-    time: "6h",
-    avatar:
-      "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=100&q=60",
-    text: "Working on some exciting new designs! 🌸 What do you think?",
-    image:
-      "https://images.unsplash.com/photo-1603570417035-7c8cc4e3e66e?auto=format&fit=crop&w=800&q=60",
-    likes: 67,
-    comments: ["Looks great!", "Can't wait to see more!"],
-    shares: 3,
-  },
-];
-
 const Home = () => {
   const [stories, setStories] = useState(storiesData);
-  const [posts, setPosts] = useState(postsData);
+  const [posts, setPosts] = useState([]);
   const [selectedStory, setSelectedStory] = useState(null);
   const [addStoryOpen, setAddStoryOpen] = useState(false);
   const [commentModalPost, setCommentModalPost] = useState(null);
   const [commentText, setCommentText] = useState("");
+
+  //  Fetch posts dynamically
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/posts");
+        const data = await res.json();
+
+        const formatted = data.map((post) => ({
+          id: post._id,
+          name: post.userName || "Unknown User",
+          username: `@${post.userName?.toLowerCase().replace(/\s+/g, "_") || "user"}`,
+          time: new Date(post.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          avatar: post.avatar || "https://via.placeholder.com/40",
+          text: post.text || "",
+          image: post.images?.[0] || null,
+          likes: post.likes?.length || 0,
+          comments: post.comments?.map((c) => c.text || c) || [],
+          shares: post.shares || 0,
+        }));
+
+        setPosts(formatted);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const togglePostLike = (postId) => {
     setPosts((prev) =>
@@ -164,58 +165,64 @@ const Home = () => {
         </div>
 
         {/* Feed */}
-        {posts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 mb-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <img
-                src={post.avatar}
-                alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div>
-                <h2 className="font-semibold text-black dark:text-white">
-                  {post.name}
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {post.username} • {post.time}
-                </p>
+        {posts.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-10">
+            Loading posts...
+          </p>
+        ) : (
+          posts.map((post) => (
+            <div
+              key={post.id}
+              className="bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 mb-6 hover:shadow-md transition"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <img
+                  src={post.avatar}
+                  alt="avatar"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <h2 className="font-semibold text-black dark:text-white">
+                    {post.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {post.username} • {post.time}
+                  </p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-3">{post.text}</p>
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt="Post"
+                  className="w-full rounded-lg mb-3"
+                />
+              )}
+
+              {/* Reaction Bar */}
+              <div className="flex justify-around text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-3">
+                <button
+                  className="flex items-center gap-2 hover:text-red-500"
+                  onClick={() => togglePostLike(post.id)}
+                >
+                  <FaRegHeart /> {post.likes}
+                </button>
+                <button
+                  className="flex items-center gap-2 hover:text-blue-500"
+                  onClick={() => setCommentModalPost(post)}
+                >
+                  <FaRegComment /> {post.comments.length}
+                </button>
+                <button className="flex items-center gap-2 hover:text-green-500">
+                  <FaShare /> {post.shares}
+                </button>
+                <button className="hover:text-yellow-500">
+                  <FaRegBookmark />
+                </button>
               </div>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 mb-3">{post.text}</p>
-            {post.image && (
-              <img
-                src={post.image}
-                alt="Post"
-                className="w-full rounded-lg mb-3"
-              />
-            )}
-
-            {/* Reaction Bar */}
-            <div className="flex justify-around text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-3">
-              <button
-                className="flex items-center gap-2 hover:text-red-500"
-                onClick={() => togglePostLike(post.id)}
-              >
-                <FaRegHeart /> {post.likes}
-              </button>
-              <button
-                className="flex items-center gap-2 hover:text-blue-500"
-                onClick={() => setCommentModalPost(post)}
-              >
-                <FaRegComment /> {post.comments.length}
-              </button>
-              <button className="flex items-center gap-2 hover:text-green-500">
-                <FaShare /> {post.shares}
-              </button>
-              <button className="hover:text-yellow-500">
-                <FaRegBookmark />
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
 
         {/* Add Story Modal */}
         {addStoryOpen && (
@@ -271,10 +278,10 @@ const Home = () => {
           </div>
         )}
 
-        {/* Comment Modal */}
+        {/* ✅ Comment Modal (centered in the middle) */}
         {commentModalPost && (
-          <div className="fixed inset-0 bg-black/50 flex items-end justify-center z-50">
-            <div className="bg-white dark:bg-[#1A1A1A] w-full max-w-md rounded-t-2xl p-4 relative border border-gray-200 dark:border-gray-700 shadow-xl">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-[#1A1A1A] w-full max-w-md rounded-2xl p-4 relative border border-gray-200 dark:border-gray-700 shadow-xl">
               <button
                 onClick={() => setCommentModalPost(null)}
                 className="absolute top-3 right-3 text-gray-500 dark:text-gray-300 hover:text-red-500 transition"
