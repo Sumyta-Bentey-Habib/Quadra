@@ -2,33 +2,28 @@
 import React, { useState } from "react";
 import { TrendingUp, UserPlus, Sparkles, Hash, Users, Calendar } from "lucide-react";
 
+const trendingTopics = [
+  { tag: "WebDevelopment", posts: "12.5K", trend: "+15%" },
+  { tag: "AI", posts: "45.2K", trend: "+28%" },
+  { tag: "NextJS", posts: "8.3K", trend: "+12%" },
+  { tag: "OpenSource", posts: "22.1K", trend: "+9%" },
+  { tag: "Design", posts: "18.7K", trend: "+21%" },
+];
+
+const suggestedUsers = [
+  { id: 1, name: "Sarah Chen", username: "@sarahdev", avatar: "/api/placeholder/40/40", followers: "12K", bio: "Full-stack developer" },
+  { id: 2, name: "Alex Rivera", username: "@alexcodes", avatar: "/api/placeholder/40/40", followers: "8.5K", bio: "UI/UX Designer" },
+  { id: 3, name: "Maya Patel", username: "@mayatech", avatar: "/api/placeholder/40/40", followers: "15K", bio: "Tech enthusiast" },
+];
+
+const upcomingEvents = [
+  { title: "Web Summit 2025", date: "Oct 15", attendees: "2.3K" },
+  { title: "React Conf", date: "Oct 22", attendees: "1.8K" },
+];
+
+
 export default function RightSidebarComponets() {
-  
-    
-
-
-
-
   const [followedUsers, setFollowedUsers] = useState([]);
-
-  const trendingTopics = [
-    { tag: "WebDevelopment", posts: "12.5K", trend: "+15%" },
-    { tag: "AI", posts: "45.2K", trend: "+28%" },
-    { tag: "NextJS", posts: "8.3K", trend: "+12%" },
-    { tag: "OpenSource", posts: "22.1K", trend: "+9%" },
-    { tag: "Design", posts: "18.7K", trend: "+21%" },
-  ];
-
-  const suggestedUsers = [
-    { id: 1, name: "Sarah Chen", username: "@sarahdev", avatar: "/api/placeholder/40/40", followers: "12K", bio: "Full-stack developer" },
-    { id: 2, name: "Alex Rivera", username: "@alexcodes", avatar: "/api/placeholder/40/40", followers: "8.5K", bio: "UI/UX Designer" },
-    { id: 3, name: "Maya Patel", username: "@mayatech", avatar: "/api/placeholder/40/40", followers: "15K", bio: "Tech enthusiast" },
-  ];
-
-  const upcomingEvents = [
-    { title: "Web Summit 2025", date: "Oct 15", attendees: "2.3K" },
-    { title: "React Conf", date: "Oct 22", attendees: "1.8K" },
-  ];
 
   const handleFollow = (userId) => {
     setFollowedUsers((prev) =>
@@ -41,16 +36,16 @@ export default function RightSidebarComponets() {
   };
 
   return (
-    <div className="sticky right-0 top-0 h-screen w-80 overflow-y-auto border-l border-gray-200 bg-gradient-to-b from-gray-50 to-white p-6 max-xl:hidden">
+    <div className="sticky right-0 top-0 h-screen w-80 overflow-y-auto border-l border-gray-200  p-6 max-xl:hidden">
       <div className="space-y-6">
         {/* Trending Topics Section */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className="rounded-xl border border-gray-200 bg-background shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="p-4 pb-3">
             <div className="flex items-center gap-2 mb-2">
               <div className="rounded-full bg-gradient-to-r from-orange-500 to-pink-500 p-2">
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Trending Now</h3>
+              <h3 className="text-lg font-semibold">Trending Now</h3>
             </div>
             <p className="text-sm text-gray-500">What&apos;s hot in your network</p>
           </div>
@@ -81,13 +76,13 @@ export default function RightSidebarComponets() {
         </div>
 
         {/* Suggested Users Section */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className="rounded-xl border border-gray-200 bg-background shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="p-4 pb-3">
             <div className="flex items-center gap-2 mb-2">
               <div className="rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-2">
                 <Sparkles className="h-4 w-4 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">People to Follow</h3>
+              <h3 className="text-lg font-semibold ">People to Follow</h3>
             </div>
             <p className="text-sm text-gray-500">Based on your interests</p>
           </div>
@@ -123,7 +118,7 @@ export default function RightSidebarComponets() {
                   <button
                     className={`h-8 px-3 text-xs font-medium rounded-md transition-all flex items-center gap-1 ${
                       followedUsers.includes(user.id)
-                        ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                        ? "bg-gray-100 hover:bg-background text-gray-700"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     }`}
                     onClick={() => handleFollow(user.id)}
@@ -138,7 +133,7 @@ export default function RightSidebarComponets() {
                     )}
                   </button>
                 </div>
-                <div className="mt-4 h-px bg-gray-200" />
+                <div className="mt-4 h-px bg-background" />
               </div>
             ))}
             <button className="w-full text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg py-2 transition-colors">
@@ -148,24 +143,24 @@ export default function RightSidebarComponets() {
         </div>
 
         {/* Upcoming Events Section */}
-        <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-blue-50 to-purple-50 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className="rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="p-4 pb-3">
             <div className="flex items-center gap-2">
               <div className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-2">
                 <Calendar className="h-4 w-4 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
+              <h3 className="text-lg font-semibold">Upcoming Events</h3>
             </div>
           </div>
           <div className="px-4 pb-4 space-y-3">
             {upcomingEvents.map((event, index) => (
               <div
                 key={index}
-                className="cursor-pointer rounded-lg bg-white p-3 shadow-sm hover:shadow-md transition-all"
+                className="cursor-pointer rounded-lg bg-background p-3 shadow-sm hover:shadow-md transition-all"
               >
                 <p className="font-semibold text-sm">{event.title}</p>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="inline-flex items-center rounded-md border border-gray-300 bg-white px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                  <span className="inline-flex items-center rounded-md border border-gray-300 bg-background px-2.5 py-0.5 text-xs font-medium text-gray-700">
                     {event.date}
                   </span>
                   <div className="flex items-center gap-1 text-xs text-gray-600">
