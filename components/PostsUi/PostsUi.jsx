@@ -34,6 +34,7 @@ const PostsUi = ({ user }) => {
     };
     fetchPosts();
   }, [userId]);
+  console.log(userId)
 
   // Close menu on outside click
   useEffect(() => {
@@ -92,6 +93,7 @@ const PostsUi = ({ user }) => {
       </div>
     );
   }
+  console.log(posts)
 
   return (
     <>
