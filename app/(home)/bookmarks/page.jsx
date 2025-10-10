@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import PostCard from "../postcards/page"; 
+import NoData from "@/components/nodata/NoData";
 
 const BACKEND_URL ="http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -70,7 +71,9 @@ const BookmarksPage = () => {
         <h1 className="text-2xl font-bold mb-6">My Bookmarks</h1>
 
         {bookmarks.length === 0 ? (
-          <p className="text-muted-foreground">No bookmarks yet.</p>
+          <p className="text-muted-foreground">
+            <NoData></NoData>
+          </p>
         ) : (
           <div className="flex flex-col gap-4">
             {bookmarks.map((post) => (

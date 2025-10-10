@@ -134,7 +134,7 @@ export default function PostCard({ post, userData, userName, avatar }) {
   };
 
   return (
-    <div className="border rounded-lg p-4 mb-4 shadow relative bg-white">
+    <div className="border rounded-lg p-4 mb-4 shadow relative ">
       {alert.message && (
         <Alert
           variant={alert.type === "error" ? "destructive" : "default"}
