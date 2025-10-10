@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Heart, Laugh, Angry, ThumbsUp } from "lucide-react";
 
 export default function Likes({ postId, currentUser }) {
-    console.log("currentUser", currentUser);
+    // console.log("currentUser", currentUser);
     
   const [reactions, setReactions] = useState([]);
   const [userReaction, setUserReaction] = useState(null);
@@ -82,7 +82,7 @@ export default function Likes({ postId, currentUser }) {
   };
 
   return (
-    <div className="flex flex-col gap-2 mt-3 relative">
+    <div className="flex flex-col gap-2 relative">
       {/* Like button */}
       <div className="relative inline-block" ref={popupRef}>
         <button

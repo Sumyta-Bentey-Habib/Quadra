@@ -13,6 +13,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
   const [preview, setPreview] = useState(user.photoUrl || "https://i.pravatar.cc/150");
@@ -41,7 +42,7 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
 
     // Word limit check for bio
     if (countWords(bio) > 50) {
-      alert("Bio cannot exceed 50 words.");
+      toast.error("Bio cannot exceed 50 words.", { position: "top-center" });
       return;
     }
 
@@ -60,11 +61,17 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
           method: "POST",
           body: formData,
         });
+
+        if (!res.ok) {
+          toast.error("Image upload failed. Try again.", { position: "top-center" });
+          return;
+        }
+
         const data = await res.json();
         photoUrl = data.secure_url;
       } catch (error) {
         console.error("Cloudinary upload failed:", error);
-        alert("Image upload failed");
+        toast.error("Something went wrong during upload.", { position: "top-center" });
         return;
       }
     }
@@ -78,15 +85,14 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
       });
 
       if (res.ok) {
-        alert("Profile updated successfully!");
-        setUpdateUi(!updateUi)
-        // window.location.reload();
+        toast.success("Profile updated successfully!", { position: "top-center" });
+        setUpdateUi(!updateUi);
       } else {
-        alert("Update failed");
+        toast.error("Profile update failed. Please try again.", { position: "top-center" });
       }
     } catch (error) {
       console.error("Update error:", error);
-      alert("Update failed");
+      toast.error("Something went wrong while updating.", { position: "top-center" });
     }
   };
 
@@ -156,32 +162,17 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
             </p>
           </div>
 
-          {/* Twitter */}
-          <input
-            type="url"
-            name="twitter"
-            placeholder="Twitter / X Profile URL"
-            defaultValue={user.twitter || ""}
-            className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
-          />
-
-          {/* LinkedIn */}
-          <input
-            type="url"
-            name="linkedin"
-            placeholder="LinkedIn Profile URL"
-            defaultValue={user.linkedin || ""}
-            className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
-          />
-
-          {/* Portfolio */}
-          <input
-            type="url"
-            name="portfolio"
-            placeholder="Portfolio URL"
-            defaultValue={user.portfolio || ""}
-            className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
-          />
+          {/* Social Links */}
+          {["twitter", "linkedin", "portfolio"].map((field) => (
+            <input
+              key={field}
+              type="url"
+              name={field}
+              placeholder={`${field.charAt(0).toUpperCase() + field.slice(1)} Profile URL`}
+              defaultValue={user[field] || ""}
+              className="w-full bg-transparent border-b-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-2 py-2 focus:border-gray-500 dark:focus:border-gray-400 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+            />
+          ))}
 
           {/* Buttons */}
           <DialogFooter className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -191,9 +182,10 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
               </Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button  className="cursor-pointer" size="sm" type="submit">Save</Button>
+              <Button className="cursor-pointer" size="sm" type="submit">
+                Save
+              </Button>
             </DialogClose>
-
           </DialogFooter>
         </form>
       </DialogContent>
