@@ -82,7 +82,7 @@ const MessageHeader = ({ conversation }) => {
 						</Button>
 						<div className="relative">
 							<Avatar className='ml-2'>
-								<AvatarImage src={conversation.isGroup ? null : otherUser?.imageUrl} />
+								<AvatarImage src={conversation.isGroup ? null : otherUser?.photoUrl} />
 								<AvatarFallback>{conversation.isGroup ? conversation.groupName[0] : otherUser?.name[0]}</AvatarFallback>
 							</Avatar>
 							{!conversation.isGroup && (
