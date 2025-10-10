@@ -1,21 +1,29 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Feather,
-  MessageCircle,
-  Share2,
-  MoreHorizontal,
-} from "lucide-react";
+import { Feather, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import EditPostModal from "../ProfilePage/EditPostModal";
 import Likes from "../ProfilePage/Likes";
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
-const PostsUi = ({ user, updatePostUi }) => {
+const PostsUi = ({ user, updatePostUi, updateUi, setUpdateUi }) => {
   const [posts, setPosts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
+  const [postToDelete, setPostToDelete] = useState(null);
   const menuRefs = useRef({});
   const { data: session } = useSession();
   const userId = session?.user?.id;
@@ -30,59 +38,47 @@ const PostsUi = ({ user, updatePostUi }) => {
         setPosts(data);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
+        toast.error("Failed to load posts.", { position: "top-center" });
       }
     };
     fetchPosts();
   }, [userId, updatePostUi]);
-  console.log(userId)
-
-  // Close menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        Object.values(menuRefs.current).every(
-          (ref) => ref && !ref.contains(event.target)
-        )
-      ) {
-        setMenuOpen(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // Delete post
-  const handleDelete = async (postId) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+  const confirmDelete = async () => {
+    if (!postToDelete) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/posts/${postId}`, {
+      const res = await fetch(`http://localhost:5000/posts/${postToDelete._id}`, {
         method: "DELETE",
       });
+
       if (res.ok) {
-        setPosts((prev) => prev.filter((post) => post._id !== postId));
+        setPosts((prev) => prev.filter((p) => p._id !== postToDelete._id));
+        setUpdateUi(!updateUi)
+        toast.success("Post deleted successfully!", { position: "top-center" });
+      } else {
+        const err = await res.json();
+        toast.error(err.message || "Failed to delete post.", { position: "top-center" });
       }
     } catch (error) {
       console.error("Error deleting post:", error);
+      toast.error("Error deleting post.", { position: "top-center" });
+    } finally {
+      setPostToDelete(null);
     }
   };
 
-  // Open edit modal
-  const handleEditClick = (post) => {
-    setEditingPost(post);
-  };
-
-  // Update post after editing
+  // Edit handlers
+  const handleEditClick = (post) => setEditingPost(post);
   const handleUpdatePost = (updatedPost) => {
-    setPosts((prev) =>
-      prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
-    );
+    setPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
     setEditingPost(null);
   };
 
   if (!posts.length) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md text-center">
+      <div className="bg-white dark:bg-black p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md text-center">
         <div className="flex flex-col justify-center items-center p-8 sm:p-12 border-2 border-gray-200 dark:border-gray-700 border-dashed rounded-lg">
           <Feather size={40} className="text-gray-400 dark:text-gray-500 mb-3 sm:mb-4" />
           <h3 className="text-lg sm:text-xl font-semibold">The Canvas is Empty</h3>
@@ -93,7 +89,6 @@ const PostsUi = ({ user, updatePostUi }) => {
       </div>
     );
   }
-  console.log(posts)
 
   return (
     <>
@@ -101,7 +96,7 @@ const PostsUi = ({ user, updatePostUi }) => {
         {posts.map((post) => (
           <div
             key={post._id}
-            className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm"
+            className="relative bg-white dark:bg-black p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -115,9 +110,7 @@ const PostsUi = ({ user, updatePostUi }) => {
                   className="w-10 h-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
                 />
                 <div>
-                  <h4 className="font-semibold text-gray-800 dark:text-gray-200">
-                    {post.userName}
-                  </h4>
+                  <h4 className="font-semibold text-gray-800 dark:text-gray-200">{post.userName}</h4>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
                     {new Date(post.createdAt).toLocaleString()}
                   </p>
@@ -136,25 +129,45 @@ const PostsUi = ({ user, updatePostUi }) => {
                 </button>
 
                 {menuOpen === post._id && (
-                  <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
+                  <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-black border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
                     <button
                       className="block cursor-pointer w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
                       onClick={() => handleEditClick(post)}
                     >
                       Edit Post
                     </button>
-                    <button
-                      className="block cursor-pointer w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => handleDelete(post._id)}
-                    >
-                      Delete Post
-                    </button>
+
+                    {/* Delete with AlertDialog */}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          className="block w-full text-left px-4 py-2 cursor-pointer text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          onClick={() => setPostToDelete(post)}
+                        >
+                          Delete Post
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. Your post will be permanently deleted.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={confirmDelete} className="cursor-pointer">
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Content */}
+            {/* Post Content */}
             <p className="text-gray-700 dark:text-gray-300 mb-4">{post.text}</p>
 
             {post.images?.length > 0 && (
@@ -178,9 +191,7 @@ const PostsUi = ({ user, updatePostUi }) => {
 
             {/* Actions */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
-              <div>
-                <Likes currentUser={user} postId={ post._id } />
-              </div>
+              <Likes currentUser={user} postId={post._id} />
               <button className="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition">
                 <MessageCircle size={18} /> <span>Comment</span>
               </button>

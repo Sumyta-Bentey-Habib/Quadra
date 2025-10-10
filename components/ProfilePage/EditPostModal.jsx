@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 const EditPostModal = ({ post, onClose, onUpdate }) => {
   const [text, setText] = useState(post.text);
@@ -52,10 +53,10 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
         );
         const data = await res.json();
         if (data.secure_url) uploadedUrls.push(data.secure_url);
-        else alert("Image upload failed!");
+        else toast.error("Failed to Upload image.", { position: "top-center" });
       } catch (err) {
         console.error("Error uploading image:", err);
-        alert("Error uploading image!");
+        toast.error(err.message || "Error uploading image", { position: "top-center" });
       }
     }
 
@@ -80,13 +81,14 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
       if (res.ok) {
         const updatedPost = await res.json();
         onUpdate(updatedPost);
+        toast.success("Post updated successfully!", { position: "top-center" });
         onClose();
       } else {
-        alert("Failed to update post.");
+        toast.error("Failed to update post.", { position: "top-center" });
       }
     } catch (err) {
       console.error(err);
-      alert("Error updating post.");
+      toast.error("Error updating post.", { position: "top-center" });
     } finally {
       setLoading(false);
       setNewFiles([]);
@@ -140,7 +142,7 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
                   />
                   <button
                     onClick={() => handleRemoveImage(img)}
-                    className="absolute top-1 right-1 bg-black/70 text-white text-xs rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition"
+                    className="absolute top-1 cursor-pointer right-1 bg-black/70 text-white text-xs rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition"
                   >
                     ✕
                   </button>
