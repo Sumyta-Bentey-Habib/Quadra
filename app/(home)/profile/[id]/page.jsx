@@ -14,6 +14,8 @@ const ProfilePage = () => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [posts, setPosts] = useState([]);
+	const [ updateUi, setUpdateUi ] = useState(false)
+	const [ updatePostUi, setUpdatePostUi ] = useState(false)
 
 	const { data: session } = useSession();
 	const userId = session?.user?.id;
@@ -31,7 +33,7 @@ const ProfilePage = () => {
 			}
 		};
 		fetchPosts();
-	}, [userId]);
+	}, [userId, updateUi]);
 
 	// Fetch user data by ID
 	useEffect(() => {
@@ -49,7 +51,7 @@ const ProfilePage = () => {
 		};
 
 		if (id) fetchUser();
-	}, [id]);
+	}, [id, updateUi ]);
 
 	if (loading) {
 		return (
@@ -204,7 +206,7 @@ const ProfilePage = () => {
 
 							{/* Edit Button */}
 							<div className='mt-4 sm:mt-6'>
-								<EditProfileModal user={user} />
+								<EditProfileModal user={ user } setUpdateUi={ setUpdateUi } updateUi={ updateUi } />
 							</div>
 						</div>
 					</div>
@@ -212,7 +214,7 @@ const ProfilePage = () => {
 
 				{/* --- Right Column (Feed) --- */}
 				<div className='lg:col-span-3 space-y-6 sm:space-y-8'>
-					<CreatePost user={user} />
+					<CreatePost user={user} setUpdatePostUi={ setUpdatePostUi } updatePostUi={ updatePostUi } />
 					<div className='space-y-4'>
 						{/* Sorting */}
 						{/* <div className="flex items-center justify-end gap-2">
@@ -233,7 +235,7 @@ const ProfilePage = () => {
             </div> */}
 
 						<div>
-							<PostsUi user={user} />
+							<PostsUi user={user} setUpdatePostUi={ setUpdatePostUi } updatePostUi={ updatePostUi } />
 						</div>
 					</div>
 				</div>
