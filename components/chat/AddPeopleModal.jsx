@@ -41,7 +41,7 @@ export default function AddPeopleModal({ open, setOpen, conversation, currentUse
 		}
 
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/${conversation._id}/members`,
+			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/members/${conversation._id}`,
 				{
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },

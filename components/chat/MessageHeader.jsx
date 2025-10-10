@@ -18,6 +18,8 @@ const MessageHeader = ({ conversation }) => {
 	const [openAddPeople, setOpenAddPeople] = useState(false);
 
 	const otherUser = conversation.participantDetails?.find((p) => p._id !== session?.user?.id);
+	console.log(otherUser);
+	console.log(conversation);
 
 	useEffect(() => {
 		if (!socket.connected) {
