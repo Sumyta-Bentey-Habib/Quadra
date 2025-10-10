@@ -1,0 +1,131 @@
+"use client";
+import React, { useEffect, useState, useRef } from "react";
+import { Heart, Laugh, Angry, ThumbsUp } from "lucide-react";
+
+export default function Likes({ postId, currentUser }) {
+    console.log("currentUser", currentUser);
+    
+  const [reactions, setReactions] = useState([]);
+  const [userReaction, setUserReaction] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const popupRef = useRef(null);
+  const totalReactions = reactions.length;
+
+  const reactionTypes = [
+    { type: "like", icon: <ThumbsUp size={22} />, color: "text-blue-500" },
+    { type: "love", icon: <Heart size={22} />, color: "text-red-500" },
+    { type: "haha", icon: <Laugh size={22} />, color: "text-yellow-400" },
+    { type: "angry", icon: <Angry size={22} />, color: "text-orange-500" },
+  ];
+
+  // Fetch post reactions
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/posts/?postId=${postId}`);
+        const data = await res.json();
+        setReactions(data.likes || []);
+
+        const userLike = data.likes.find((l) => l.userId === currentUser._id);
+        if (userLike) setUserReaction(userLike.reaction);
+      } catch (error) {
+        console.error("Failed to fetch likes:", error);
+      }
+    };
+    fetchLikes();
+  }, [postId, currentUser]);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popupRef.current && !popupRef.current.contains(e.target)) {
+        setShowPopup(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle reaction select
+  const handleReact = async (reactionType) => {
+    if (loading) return;
+    setLoading(true);
+
+    const newReaction = userReaction === reactionType ? null : reactionType;
+
+    try {
+      const res = await fetch(`http://localhost:5000/posts/${postId}/like`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser._id,
+          userName: currentUser.name,
+          avatar: currentUser.photoUrl, 
+          reaction: newReaction,      
+        }),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setReactions(updated.likes || []);
+        setUserReaction(newReaction);
+      } else {
+        console.error("Failed to update reaction");
+      }
+    } catch (error) {
+      console.error("Reaction error:", error);
+    } finally {
+      setLoading(false);
+      setShowPopup(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 mt-3 relative">
+      {/* Like button */}
+      <div className="relative inline-block" ref={popupRef}>
+        <button
+          disabled={loading}
+          onClick={() => setShowPopup((prev) => !prev)}
+          className={`flex items-center justify-center gap-1 px-3 py-1 rounded-full cursor-pointer transition font-medium 
+            ${userReaction ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"}
+            hover:bg-blue-50`}
+        >
+          
+          <span className="text-sm  flex items-center justify-center gap-1">
+            { !userReaction && <> <ThumbsUp size={20} /> Like </>}
+            { userReaction == "like" && <ThumbsUp className="text-blue-600" size={22} />}
+            { userReaction == "love" && <Heart className="text-red-600" size={22} />}
+            { userReaction == "haha" && <Laugh className="text-yellow-500" size={22} />}
+            { userReaction == "angry" && <Angry className="text-orange-600" size={22} />}
+          </span>
+      
+        <div className="text-xs text-gray-500">  
+            {userReaction && <span>({totalReactions})</span> }  
+        </div>
+        </button>
+
+        {/* Popup */}
+        {showPopup && (
+          <div
+            className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-full px-4 py-2 shadow-lg flex gap-3 z-20 animate-fadeIn"
+          >
+            {reactionTypes.map((r) => (
+              <button
+                key={r.type}
+                onClick={() => handleReact(r.type)}
+                disabled={loading}
+                className={`flex flex-col items-center cursor-pointer transition transform hover:scale-125 ${r.color}`}
+              >
+                {r.icon}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      
+    </div>
+  );
+}

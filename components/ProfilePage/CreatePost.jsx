@@ -33,7 +33,7 @@ const uploadToCloudinary = async (file) => {
   return data.secure_url;
 };
 
-const CreatePost = ({ user }) => {
+const CreatePost = ({ user, setUpdatePostUi, updatePostUi }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
@@ -108,7 +108,8 @@ const CreatePost = ({ user }) => {
 
       const createdPost = await res.json();
       console.log("Post created:", createdPost);
-      window.location.reload()
+      setUpdatePostUi(!updatePostUi)
+      // window.location.reload()
       // Clear form
       form.reset();
       setSelectedImages([]);
@@ -171,7 +172,7 @@ const CreatePost = ({ user }) => {
               </p>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                  <Button className="mt-2 cursor- bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
                     Close
                   </Button>
                 </DialogClose>
@@ -197,7 +198,7 @@ const CreatePost = ({ user }) => {
               </p>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button className="mt-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                  <Button className="mt-2 cursor-pointer bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600">
                     Close
                   </Button>
                 </DialogClose>

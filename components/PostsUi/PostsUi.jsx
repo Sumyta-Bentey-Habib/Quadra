@@ -3,16 +3,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
   Feather,
-  Heart,
   MessageCircle,
   Share2,
   MoreHorizontal,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import EditPostModal from "../ProfilePage/EditPostModal";
+import Likes from "../ProfilePage/Likes";
 
 
-const PostsUi = ({ user }) => {
+const PostsUi = ({ user, updatePostUi }) => {
   const [posts, setPosts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
@@ -33,7 +33,7 @@ const PostsUi = ({ user }) => {
       }
     };
     fetchPosts();
-  }, [userId]);
+  }, [userId, updatePostUi]);
   console.log(userId)
 
   // Close menu on outside click
@@ -178,9 +178,9 @@ const PostsUi = ({ user }) => {
 
             {/* Actions */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
-              <button className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition">
-                <Heart size={18} /> <span>Like</span>
-              </button>
+              <div>
+                <Likes currentUser={user} postId={ post._id } />
+              </div>
               <button className="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition">
                 <MessageCircle size={18} /> <span>Comment</span>
               </button>

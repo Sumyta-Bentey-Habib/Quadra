@@ -14,7 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
-const EditProfileModal = ({ user }) => {
+const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
   const [preview, setPreview] = useState(user.photoUrl || "https://i.pravatar.cc/150");
   const [bio, setBio] = useState(user.bio || "");
   const fileInputRef = useRef(null);
@@ -79,7 +79,8 @@ const EditProfileModal = ({ user }) => {
 
       if (res.ok) {
         alert("Profile updated successfully!");
-        window.location.reload();
+        setUpdateUi(!updateUi)
+        // window.location.reload();
       } else {
         alert("Update failed");
       }
@@ -189,9 +190,10 @@ const EditProfileModal = ({ user }) => {
                 Cancel
               </Button>
             </DialogClose>
-            <Button className="cursor-pointer" size="sm" type="submit">
-              Save
-            </Button>
+            <DialogClose asChild>
+              <Button  className="cursor-pointer" size="sm" type="submit">Save</Button>
+            </DialogClose>
+
           </DialogFooter>
         </form>
       </DialogContent>
