@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
+import { socket } from "@/lib/socket";
 
 export default function NewConversationCombobox({ currentUserId, open, setOpen, trigger }) {
 	const [users, setUsers] = useState([]);
@@ -14,9 +15,27 @@ export default function NewConversationCombobox({ currentUserId, open, setOpen, 
 	const router = useRouter();
 
 	useEffect(() => {
-		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`)
-			.then((res) => res.json())
-			.then((data) => setUsers(data.filter((u) => u._id !== currentUserId)));
+		// Connect and authenticate socket if not already done
+		if (!socket.connected) {
+			socket.connect();
+		}
+
+		if (socket.connected && currentUserId && !socket.authenticated) {
+			socket.emit("authenticate", currentUserId);
+			socket.authenticated = true;
+		}
+
+		const fetchUsers = async () => {
+			try {
+				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`);
+				const data = await res.json();
+				setUsers(data.filter((u) => u._id !== currentUserId));
+			} catch (error) {
+				console.error("Failed to fetch users:", error);
+			}
+		};
+
+		fetchUsers();
 	}, [currentUserId]);
 
 	const handleSelect = async (user) => {
