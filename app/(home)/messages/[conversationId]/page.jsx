@@ -11,13 +11,15 @@ export default async function ConversationPage({ params }) {
 	const conversationId = (await params).conversationId;
 
 	// Fetch conversation details + messages
-	const [conversationRes, messagesRes] = await Promise.all([
+	const [conversationRes, messagesRes, conversationsRes] = await Promise.all([
 		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/${conversationId}`, { cache: "no-store" }),
 		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/messages/${conversationId}`, { cache: "no-store" }),
+		fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/conversations/user/${userId}`, { cache: "no-store" }),
 	]);
 
 	const conversation = await conversationRes.json();
 	const messages = await messagesRes.json();
+	const conversations = await conversationsRes.json();
 
 	return (
 		<div className='min-h-full flex flex-col'>
@@ -29,6 +31,7 @@ export default async function ConversationPage({ params }) {
 					messages={messages}
 					currentUserId={userId}
 					conversationId={conversationId}
+					conversations={conversations}
 				/>
 			</ScrollArea>
 			{/* Message Input */}
