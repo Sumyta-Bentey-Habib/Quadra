@@ -7,13 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LogIn } from "lucide-react";
+import { LogIn, Upload } from "lucide-react";
 import { useAlertDialog } from "@/components/hooks/use-alert-dialog";
+import { useState } from "react";
 
 export default function LoginForm({ mode = "login" }) {
   const router = useRouter();
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null); // New: selected file
 
-  // Form schema depending on mode
+  // --- Form schema ---
   const formSchema =
     mode === "signup"
       ? z.object({
@@ -37,9 +40,44 @@ export default function LoginForm({ mode = "login" }) {
 
   const { showAlert, AlertDialogUI } = useAlertDialog();
 
+  // --- Handle file selection ---
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  // --- Handle Cloudinary upload on button click ---
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "project_quadra"); 
+
+    try {
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/dizstnwr7/image/upload`, 
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      if (data.secure_url) {
+        form.setValue("photoUrl", data.secure_url);
+      }
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // --- Form submission ---
   async function onSubmit(values) {
     if (mode === "login") {
-      // Login
       const res = await signIn("credentials", {
         redirect: false,
         email: values.email,
@@ -61,7 +99,7 @@ export default function LoginForm({ mode = "login" }) {
         });
       }
     } else {
-      // Signup
+      // --- Signup ---
       try {
         const res = await fetch("/api/auth/signup", {
           method: "POST",
@@ -70,13 +108,30 @@ export default function LoginForm({ mode = "login" }) {
         });
 
         const data = await res.json();
+
         if (res.ok) {
-          showAlert({
-            title: "Account Created!",
-            description: "You can now login",
-            confirmText: "Go to Login",
-            onConfirm: () => router.push("/login"),
+          // Automatically sign in after successful signup
+          const loginRes = await signIn("credentials", {
+            redirect: false,
+            email: values.email,
+            password: values.password,
           });
+
+          if (loginRes?.error) {
+            showAlert({
+              title: "Account Created!",
+              description: "Please login manually",
+              confirmText: "Go to Login",
+              onConfirm: () => router.push("/login"),
+            });
+          } else {
+            showAlert({
+              title: "Account Created!",
+              description: "You are now logged in.",
+              confirmText: "Go Home",
+              onConfirm: () => router.push("/"),
+            });
+          }
         } else {
           showAlert({
             title: "Signup Failed",
@@ -94,6 +149,7 @@ export default function LoginForm({ mode = "login" }) {
     }
   }
 
+  // --- Google Login ---
   const handleGoogleLogin = () => {
     signIn("google", { callbackUrl: "/" });
   };
@@ -132,17 +188,38 @@ export default function LoginForm({ mode = "login" }) {
           )}
         </div>
 
-        {/* Photo URL for signup */}
+        {/* Cloudinary Upload Button (Signup only) */}
         {mode === "signup" && (
-          <div>
-            <Input placeholder="Photo URL (optional)" {...form.register("photoUrl")} className="w-full" />
-            {form.formState.errors.photoUrl && (
-              <p className="text-red-500 text-sm mt-1">{form.formState.errors.photoUrl.message}</p>
-            )}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">
+              Profile Photo
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange} // only select file
+                className="text-sm text-gray-500"
+              />
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleUpload}
+                disabled={uploading || !selectedFile}
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </Button>
+              {form.watch("photoUrl") && (
+                <img
+                  src={form.watch("photoUrl")}
+                  alt="Preview"
+                  className="w-10 h-10 rounded-full object-cover border"
+                />
+              )}
+            </div>
           </div>
         )}
 
-        {/* Submit buttons */}
         <Button type="submit" className="w-full py-2">
           {mode === "login" ? "Sign In" : "Register"}
         </Button>
