@@ -43,7 +43,7 @@ export default function Feed() {
       })
       .catch((err) => console.log(err));
   }, [userEmail]);
-
+console.log(userData)
   // --- Create new post ---
   const handleCreatePost = async () => {
     if (!newPostText.trim())
@@ -55,7 +55,8 @@ export default function Feed() {
         text: newPostText,
         userId: userData._id,
         userName: userName || "Anonymous",
-        avatar: avatar || "https://i.pravatar.cc/100",
+        avatar: avatar || "https://i.pravatar.cc/100" || userData.photoUrl
+,
         images: [],
       });
       setPosts([res.data, ...posts]);
