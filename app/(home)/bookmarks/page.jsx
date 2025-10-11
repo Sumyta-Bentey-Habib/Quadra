@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import PostCard from "../postcards/page"; 
+import PostCard from "../postcards/page";
 import NoData from "@/components/nodata/NoData";
 
 const BACKEND_URL ="http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -21,16 +21,16 @@ const BookmarksPage = () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/users`);
         const user = res.data.find((u) => u.email === session.user.email);
-        setUserData(user);
+        if (user) setUserData(user);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching user:", err);
       }
     };
 
     fetchUserData();
   }, [session]);
 
-  // Fetch bookmarks — must include userId
+  // Fetch bookmarks
   useEffect(() => {
     if (!userData?._id) return;
 
@@ -38,7 +38,7 @@ const BookmarksPage = () => {
       try {
         setLoading(true);
         const res = await axios.get(`${BACKEND_URL}/bookmarks/${userData._id}`);
-        setBookmarks(res.data);
+        setBookmarks(res.data || []);
       } catch (err) {
         console.error("Error fetching bookmarks:", err);
       } finally {
@@ -62,8 +62,9 @@ const BookmarksPage = () => {
     }
   };
 
-  if (!userData || loading)
+  if (!userData || loading) {
     return <p className="text-center mt-10">Loading...</p>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -71,9 +72,7 @@ const BookmarksPage = () => {
         <h1 className="text-2xl font-bold mb-6">My Bookmarks</h1>
 
         {bookmarks.length === 0 ? (
-          <p className="text-muted-foreground">
-            <NoData></NoData>
-          </p>
+          <NoData />
         ) : (
           <div className="flex flex-col gap-4">
             {bookmarks.map((post) => (
