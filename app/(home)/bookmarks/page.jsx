@@ -1,69 +1,98 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import PostCard from "../postcards/page";
+import NoData from "@/components/nodata/NoData";
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Plus, BookmarkIcon } from "lucide-react";
-
+const BACKEND_URL ="http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const BookmarksPage = () => {
+  const { data: session } = useSession();
+  const [bookmarks, setBookmarks] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch current user data
+  useEffect(() => {
+    if (!session?.user?.email) return;
+
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/users`);
+        const user = res.data.find((u) => u.email === session.user.email);
+        if (user) setUserData(user);
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+
+    fetchUserData();
+  }, [session]);
+
+  // Fetch bookmarks
+  useEffect(() => {
+    if (!userData?._id) return;
+
+    const fetchBookmarks = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${BACKEND_URL}/bookmarks/${userData._id}`);
+        setBookmarks(res.data || []);
+      } catch (err) {
+        console.error("Error fetching bookmarks:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookmarks();
+  }, [userData]);
+
+  // Remove bookmark
+  const handleRemoveBookmark = async (postId) => {
+    if (!userData?._id) return;
+    try {
+      await axios.delete(`${BACKEND_URL}/bookmarks/${userData._id}/${postId}`);
+      setBookmarks((prev) => prev.filter((p) => p._id !== postId));
+      alert("Bookmark removed!");
+    } catch (err) {
+      console.error("Error removing bookmark:", err);
+      alert(err.response?.data?.message || "Failed to remove bookmark");
+    }
+  };
+
+  if (!userData || loading) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <BookmarkIcon className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">My Bookmarks</h1>
-              <p className="text-muted-foreground">6 bookmarks</p>
-            </div>
-          </div>
+        <h1 className="text-2xl font-bold mb-6">My Bookmarks</h1>
 
-          <div className="flex gap-2">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Add Bookmark
-            </Button>
+        {bookmarks.length === 0 ? (
+          <NoData />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {bookmarks.map((post) => (
+              <div key={post._id} className="relative">
+                <PostCard
+                  post={post}
+                  userData={userData}
+                  userName={session.user.name}
+                  avatar={session.user.image}
+                />
+                <button
+                  onClick={() => handleRemoveBookmark(post._id)}
+                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
-        </div>
-
-        {/* Bookmarks Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">WebDevelopment</h3>
-            <p className="text-sm text-muted-foreground">
-              WebDevelopment is a comprehensive resource for web developers.
-            </p>
-          </div>
-
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">NextJS</h3>
-            <p className="text-sm text-muted-foreground">
-              NextJS is a React framework for building server-side rendered applications.
-            </p>
-          </div>
-
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">MongoDB</h3>
-            <p className="text-sm text-muted-foreground">NoSQL database for modern applications</p>
-          </div>
-
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">ReactJs</h3>
-            <p className="text-sm text-muted-foreground">A JavaScript library for building user interfaces</p>
-          </div>
-
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">Tailwind CSS</h3>
-            <p className="text-sm text-muted-foreground">Utility-first CSS framework</p>
-          </div>
-
-          <div className="border rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold">Tailwind CSS</h3>
-            <p className="text-sm text-muted-foreground">Utility-first CSS framework</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

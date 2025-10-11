@@ -13,7 +13,7 @@ const MessagesPage = async () => {
 			{/* Conversation List for smaller devices */}
 			<div className='bg-background border-gray-200 overflow-y-auto w-full md:hidden'>
 				<ConversationList
-					conversations={conversations}
+					initialConversations={conversations}
 					currentUserId={userId}
 				/>
 			</div>
