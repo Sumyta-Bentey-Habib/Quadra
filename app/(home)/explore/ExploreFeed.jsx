@@ -27,20 +27,20 @@ const ExploreFeed = () => {
 		fetchPosts();
 	}, []);
 
-    // Fetch user data
-  useEffect(() => {
-    if (!userEmail) return;
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`);
-        const user = res.data.find((u) => u.email === userEmail);
-        setUserData(user || null);
-      } catch (err) {
-        console.error("Error fetching user:", err);
-      }
-    };
-    fetchUser();
-  }, [userEmail]);
+	// Fetch user data
+	useEffect(() => {
+		if (!userEmail) return;
+		const fetchUser = async () => {
+			try {
+				const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`);
+				const user = res.data.find((u) => u.email === userEmail);
+				setUserData(user || null);
+			} catch (err) {
+				console.error("Error fetching user:", err);
+			}
+		};
+		fetchUser();
+	}, [userEmail]);
 
 	const handleSearch = (e) => {
 		setSearchTerm(e.target.value);
@@ -106,11 +106,11 @@ const ExploreFeed = () => {
 			{/* Feed */}
 			{filteredPosts.map((post) => (
 				<PostCard
-					key={post.id}
+					key={post._id}
 					post={post}
-          userData={userData}
-          userName={userName}
-          avatar={avatar}
+					userData={userData}
+					userName={userName}
+					avatar={avatar}
 				/>
 			))}
 		</div>
