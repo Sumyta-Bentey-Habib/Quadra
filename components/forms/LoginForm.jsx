@@ -14,10 +14,7 @@ import { useState } from "react";
 export default function LoginForm({ mode = "login" }) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
-
-  // --- Cloudinary config ---
-  const CLOUD_NAME = "dvtzmpa4t"; 
-  const UPLOAD_PRESET = "quadra"; 
+  const [selectedFile, setSelectedFile] = useState(null); // New: selected file
 
   // --- Form schema ---
   const formSchema =
@@ -43,21 +40,29 @@ export default function LoginForm({ mode = "login" }) {
 
   const { showAlert, AlertDialogUI } = useAlertDialog();
 
-  // --- Handle Cloudinary upload ---
-  const handleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // --- Handle file selection ---
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
+
+  // --- Handle Cloudinary upload on button click ---
+  const handleUpload = async () => {
+    if (!selectedFile) return;
 
     setUploading(true);
+
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("upload_preset", "project_quadra"); 
 
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/dizstnwr7/image/upload`, 
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await res.json();
       if (data.secure_url) {
@@ -113,7 +118,6 @@ export default function LoginForm({ mode = "login" }) {
           });
 
           if (loginRes?.error) {
-            // If auto login fails, still show success but go to login page
             showAlert({
               title: "Account Created!",
               description: "Please login manually",
@@ -121,7 +125,6 @@ export default function LoginForm({ mode = "login" }) {
               onConfirm: () => router.push("/login"),
             });
           } else {
-            // Successful auto login → go home
             showAlert({
               title: "Account Created!",
               description: "You are now logged in.",
@@ -195,19 +198,23 @@ export default function LoginForm({ mode = "login" }) {
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleUpload}
+                onChange={handleFileChange} // only select file
                 className="text-sm text-gray-500"
               />
-              {uploading ? (
-                <p className="text-xs text-gray-400">Uploading...</p>
-              ) : form.watch("photoUrl") ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleUpload}
+                disabled={uploading || !selectedFile}
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </Button>
+              {form.watch("photoUrl") && (
                 <img
                   src={form.watch("photoUrl")}
                   alt="Preview"
                   className="w-10 h-10 rounded-full object-cover border"
                 />
-              ) : (
-                <Upload className="w-5 h-5 text-gray-400" />
               )}
             </div>
           </div>
