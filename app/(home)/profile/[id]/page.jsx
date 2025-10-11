@@ -14,6 +14,8 @@ const ProfilePage = () => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [posts, setPosts] = useState([]);
+	const [ updateUi, setUpdateUi ] = useState(false)
+	const [ updatePostUi, setUpdatePostUi ] = useState(false)
 
 	const { data: session } = useSession();
 	const userId = session?.user?.id;
@@ -31,7 +33,7 @@ const ProfilePage = () => {
 			}
 		};
 		fetchPosts();
-	}, [userId]);
+	}, [userId, updateUi]);
 
 	// Fetch user data by ID
 	useEffect(() => {
@@ -49,7 +51,7 @@ const ProfilePage = () => {
 		};
 
 		if (id) fetchUser();
-	}, [id]);
+	}, [id, updateUi ]);
 
 	if (loading) {
 		return (
@@ -80,12 +82,12 @@ const ProfilePage = () => {
 	const completionPercentage = (completedCount / totalSteps) * 100;
 
 	return (
-		<div className='w-full min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900'>
+		<div className='w-full min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-black'>
 			<div className='grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8 min-h-screen'>
 				{/* --- Left Column (Profile Card) --- */}
 				<div className='lg:col-span-2'>
 					<div className='lg:sticky top-4'>
-						<div className='bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md'>
+						<div className='bg-white dark:bg-black p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md'>
 							{/* Profile Info */}
 							<div className='text-center'>
 								<div className='relative inline-block mb-4'>
@@ -204,7 +206,7 @@ const ProfilePage = () => {
 
 							{/* Edit Button */}
 							<div className='mt-4 sm:mt-6'>
-								<EditProfileModal user={user} />
+								<EditProfileModal user={ user } setUpdateUi={ setUpdateUi } updateUi={ updateUi } />
 							</div>
 						</div>
 					</div>
@@ -212,7 +214,7 @@ const ProfilePage = () => {
 
 				{/* --- Right Column (Feed) --- */}
 				<div className='lg:col-span-3 space-y-6 sm:space-y-8'>
-					<CreatePost user={user} />
+					<CreatePost user={user} setUpdatePostUi={ setUpdatePostUi } updatePostUi={ updatePostUi } setUpdateUi={ setUpdateUi } updateUi={ updateUi } />
 					<div className='space-y-4'>
 						{/* Sorting */}
 						{/* <div className="flex items-center justify-end gap-2">
@@ -233,7 +235,7 @@ const ProfilePage = () => {
             </div> */}
 
 						<div>
-							<PostsUi user={user} />
+							<PostsUi user={user} setUpdatePostUi={ setUpdatePostUi } updatePostUi={ updatePostUi } setUpdateUi={ setUpdateUi } updateUi={ updateUi } />
 						</div>
 					</div>
 				</div>
