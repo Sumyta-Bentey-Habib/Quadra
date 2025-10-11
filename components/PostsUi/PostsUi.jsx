@@ -18,6 +18,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import Comments from "../ProfilePage/Comments";
 
 const PostsUi = ({ user, updatePostUi, updateUi, setUpdateUi }) => {
   const [posts, setPosts] = useState([]);
@@ -192,9 +193,9 @@ const PostsUi = ({ user, updatePostUi, updateUi, setUpdateUi }) => {
             {/* Actions */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
               <Likes currentUser={user} postId={post._id} />
-              <button className="flex items-center gap-1 cursor-pointer hover:text-blue-500 transition">
-                <MessageCircle size={18} /> <span>Comment</span>
-              </button>
+              <div className="flex items-center  hover:text-blue-500 transition">
+                <Comments postId={post._id} currentUser={user}/>
+              </div>
               <button className="flex items-center gap-1 cursor-pointer hover:text-green-500 transition">
                 <Share2 size={18} /> <span>Share</span>
               </button>
