@@ -84,7 +84,7 @@ const CreatePost = ({ user, setUpdatePostUi, updatePostUi, updateUi, setUpdateUi
         userId: us?.id,
         userName: us?.name || "Anonymous",
         avatar:
-          us?.image ||
+          user?.photoUrl ||
           "https://res.cloudinary.com/dizstnwr7/image/upload/v1759867578/profile_photos/aoizjrhbuerkt3o8gzdp.png",
         text,
         images: uploadedImageUrls,
