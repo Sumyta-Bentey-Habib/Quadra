@@ -119,7 +119,7 @@ const ConversationList = ({ currentUserId, initialConversations }) => {
 										) : (
 											<>
 												<AvatarImage
-													src={otherParticipant?.imageUrl}
+													src={otherParticipant?.photoUrl}
 													alt={otherParticipant?.name}
 												/>
 												<AvatarFallback>{otherParticipant?.name[0]}</AvatarFallback>
