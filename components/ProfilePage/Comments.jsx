@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
-const BACKEND_URL = "https://quadra-server.onrender.com";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 const Comments = ({ postId, currentUser }) => {
   const [comments, setComments] = useState([]);
