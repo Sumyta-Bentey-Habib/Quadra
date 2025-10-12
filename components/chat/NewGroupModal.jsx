@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function NewGroupModal({ open, setOpen, currentUserId }) {
 	const [users, setUsers] = useState([]);
@@ -32,7 +33,7 @@ export default function NewGroupModal({ open, setOpen, currentUserId }) {
 
 	const handleCreateGroup = async () => {
 		if (!groupName.trim() || selectedUsers.length === 0) {
-			alert("Please enter a group name and select at least one user.");
+			toast("Please enter a group name and select at least one user.");
 			return;
 		}
 

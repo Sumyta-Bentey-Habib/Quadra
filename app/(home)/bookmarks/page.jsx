@@ -4,6 +4,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import PostCard from "../postcards/page";
 import NoData from "@/components/nodata/NoData";
+import { toast } from "sonner";
 
 const BACKEND_URL =process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
@@ -55,10 +56,10 @@ const BookmarksPage = () => {
     try {
       await axios.delete(`${BACKEND_URL}/bookmarks/${userData._id}/${postId}`);
       setBookmarks((prev) => prev.filter((p) => p._id !== postId));
-      alert("Bookmark removed!");
+      toast.success("Bookmark removed!");
     } catch (err) {
       console.error("Error removing bookmark:", err);
-      alert(err.response?.data?.message || "Failed to remove bookmark");
+      toast.error(err.response?.data?.message || "Failed to remove bookmark");
     }
   };
 
