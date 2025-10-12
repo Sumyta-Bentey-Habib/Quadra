@@ -25,7 +25,7 @@ const ProfilePage = () => {
 		const fetchPosts = async () => {
 			if (!userId) return;
 			try {
-				const res = await fetch(`https://quadra-server.onrender.com/posts?userId=${userId}`);
+				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts?userId=${userId}`);
 				const data = await res.json();
 				setPosts(data);
 			} catch (error) {
@@ -39,7 +39,7 @@ const ProfilePage = () => {
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				const res = await fetch(`http://localhost:5000/users/${id}`);
+				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${id}`);
 				if (!res.ok) throw new Error("Failed to fetch user");
 				const data = await res.json();
 				setUser(data);

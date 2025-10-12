@@ -91,7 +91,7 @@ const CreatePost = ({ user, setUpdatePostUi, updatePostUi, updateUi, setUpdateUi
       };
 
       // Send to backend
-      const res = await fetch("https://quadra-server.onrender.com/posts", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

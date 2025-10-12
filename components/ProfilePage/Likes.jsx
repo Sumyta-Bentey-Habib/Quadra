@@ -32,7 +32,7 @@ export default function Likes({ postId, currentUser }) {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const res = await fetch(`https://quadra-server.onrender.com/posts/?postId=${postId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/?postId=${postId}`);
         const data = await res.json();
         setReactions(data.likes || []);
 

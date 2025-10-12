@@ -34,7 +34,7 @@ const PostsUi = ({ user, updatePostUi, updateUi, setUpdateUi }) => {
     const fetchPosts = async () => {
       if (!userId) return;
       try {
-        const res = await fetch(`https://quadra-server.onrender.com/posts?userId=${userId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts?userId=${userId}`);
         const data = await res.json();
         setPosts(data);
       } catch (error) {
@@ -50,7 +50,7 @@ const PostsUi = ({ user, updatePostUi, updateUi, setUpdateUi }) => {
     if (!postToDelete) return;
 
     try {
-      const res = await fetch(`https://quadra-server.onrender.com/posts/${postToDelete._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${postToDelete._id}`, {
         method: "DELETE",
       });
 
