@@ -8,169 +8,184 @@ import NotificationList from "./components/NotificationList";
 import LoadingState from "./components/LoadingState";
 
 const NotificationsPage = () => {
-	const { data: session } = useSession();
-	const [notifications, setNotifications] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [filter, setFilter] = useState("all");
-	const [unreadCount, setUnreadCount] = useState(0);
+  const { data: session } = useSession();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
+  const [unreadCount, setUnreadCount] = useState(0);
 
-	// Fetch notifications from backend
-	const fetchNotifications = async (filterType = "all") => {
-		if (!session?.user?.id) return;
+  // Fetch notifications from backend
+  const fetchNotifications = async (filterType = "all") => {
+    if (!session?.user?.id) return;
 
-		try {
-			setLoading(true);
-			let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${session.user.id}`;
+    try {
+      setLoading(true);
+      let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${session.user.id}`;
 
-			if (filterType === "unread") {
-				url += "?read=false";
-			} else if (filterType !== "all") {
-				url += `?type=${filterType}`;
-			}
+      if (filterType === "unread") {
+        url += "?read=false";
+      } else if (filterType !== "all") {
+        url += `?type=${filterType}`;
+      }
 
-			const response = await fetch(url);
-			if (response.ok) {
-				const data = await response.json();
-				setNotifications(data);
-			}
-		} catch (error) {
-			console.error("Failed to fetch notifications:", error);
-		} finally {
-			setLoading(false);
-		}
-	};
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	// Fetch unread count
-	const fetchUnreadCount = async () => {
-		if (!session?.user?.id) return;
+  // Fetch unread count
+  const fetchUnreadCount = async () => {
+    if (!session?.user?.id) return;
 
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${session.user.id}/count`);
-			if (response.ok) {
-				const data = await response.json();
-				setUnreadCount(data.count);
-			}
-		} catch (error) {
-			console.error("Failed to fetch unread count:", error);
-		}
-	};
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${session.user.id}/count`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadCount(data.count);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unread count:", error);
+    }
+  };
 
-	// Initialize data and socket connection
-	useEffect(() => {
-		if (session?.user?.id) {
-			fetchNotifications(filter);
-			fetchUnreadCount();
-
-			// Connect to socket for real-time updates
-			socket.connect();
-			socket.emit("authenticate", session.user.id);
-
-			// Listen for new notifications
-			socket.on("newNotification", (notification) => {
-				setNotifications((prev) => [notification, ...prev]);
-				setUnreadCount((prev) => prev + 1);
-			});
-
-			return () => {
-				socket.off("newNotification");
-				socket.disconnect();
-			};
-		}
-	}, [session?.user?.id]);
-
-	// Handle filter changes
-	useEffect(() => {
+  // Initialize data and socket connection
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchNotifications(filter);
+      fetchUnreadCount();
+      const intervel = setInterval(() => {
 		fetchNotifications(filter);
-	}, [filter]);
+        fetchUnreadCount();
+      }, 50000);
+      // Connect to socket for real-time updates
+      // socket.connect();
 
-	const markAsRead = async (notificationId) => {
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${notificationId}/read`, {
-				method: "PATCH",
-			});
+      // socket.emit("authenticate", session.user.id);
 
-			if (response.ok) {
-				setNotifications((prev) => prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n)));
-				setUnreadCount((prev) => Math.max(0, prev - 1));
-			}
-		} catch (error) {
-			console.error("Failed to mark notification as read:", error);
-		}
-	};
+      // Listen for new notifications
+      // socket.on("newNotification", (notification) => {
+      // 	setNotifications((prev) => [notification, ...prev]);
+      // 	setUnreadCount((prev) => prev + 1);
+      // });
 
-	const markAllAsRead = async () => {
-		if (!session?.user?.id) return;
+      return () => {
+        // socket.off("newNotification");
+		clearInterval(intervel);
+      };
+    }
+  }, [session?.user?.id, filter]);
 
-		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/user/${session.user.id}/read-all`,
-				{ method: "PATCH" },
-			);
+  // Handle filter changes
+  useEffect(() => {
+    fetchNotifications(filter);
+  }, [filter]);
 
-			if (response.ok) {
-				setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-				setUnreadCount(0);
-			}
-		} catch (error) {
-			console.error("Failed to mark all notifications as read:", error);
-		}
-	};
+  const markAsRead = async (notificationId) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${notificationId}/read`,
+        {
+          method: "PATCH",
+        }
+      );
 
-	const deleteNotification = async (notificationId) => {
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${notificationId}`, {
-				method: "DELETE",
-			});
+      if (response.ok) {
+        setNotifications((prev) =>
+          prev.map((n) => (n._id === notificationId ? { ...n, read: true } : n))
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  };
 
-			if (response.ok) {
-				const deletedNotification = notifications.find((n) => n._id === notificationId);
-				setNotifications((prev) => prev.filter((n) => n._id !== notificationId));
-				if (!deletedNotification?.read) {
-					setUnreadCount((prev) => Math.max(0, prev - 1));
-				}
-			}
-		} catch (error) {
-			console.error("Failed to delete notification:", error);
-		}
-	};
+  const markAllAsRead = async () => {
+    if (!session?.user?.id) return;
 
-	const getInitials = (name) => {
-		return name
-			.split(" ")
-			.map((n) => n[0])
-			.join("")
-			.toUpperCase();
-	};
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/user/${session.user.id}/read-all`,
+        { method: "PATCH" }
+      );
 
-	const filteredNotifications = notifications.filter((notification) => {
-		if (filter === "unread") return !notification.read;
-		if (filter === "all") return true;
-		return notification.type === filter;
-	});
+      if (response.ok) {
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+        setUnreadCount(0);
+      }
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
+  };
 
-	if (loading) {
-		return <LoadingState />;
-	}
+  const deleteNotification = async (notificationId) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications/${notificationId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-	return (
-		<div className='min-h-screen bg-background'>
-			<NotificationHeader
-				unreadCount={unreadCount}
-				onMarkAllAsRead={markAllAsRead}
-			/>
+      if (response.ok) {
+        const deletedNotification = notifications.find(
+          (n) => n._id === notificationId
+        );
+        setNotifications((prev) =>
+          prev.filter((n) => n._id !== notificationId)
+        );
+        if (!deletedNotification?.read) {
+          setUnreadCount((prev) => Math.max(0, prev - 1));
+        }
+      }
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+    }
+  };
 
-			<NotificationFilters
-				currentFilter={filter}
-				onFilterChange={setFilter}
-			/>
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
 
-			<NotificationList
-				notifications={filteredNotifications}
-				onMarkAsRead={markAsRead}
-				onDelete={deleteNotification}
-			/>
-		</div>
-	);
+  const filteredNotifications = notifications.filter((notification) => {
+    if (filter === "unread") return !notification.read;
+    if (filter === "all") return true;
+    return notification.type === filter;
+  });
+
+  if (loading) {
+    return <LoadingState />;
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <NotificationHeader
+        unreadCount={unreadCount}
+        onMarkAllAsRead={markAllAsRead}
+      />
+
+      <NotificationFilters currentFilter={filter} onFilterChange={setFilter} />
+
+      <NotificationList
+        notifications={filteredNotifications}
+        onMarkAsRead={markAsRead}
+        onDelete={deleteNotification}
+      />
+    </div>
+  );
 };
 
 export default NotificationsPage;
