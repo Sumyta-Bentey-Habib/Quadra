@@ -3,6 +3,8 @@ import React from "react";
 import { TypeAnimation } from "react-type-animation";
 import { FaComments, FaHeart, FaShareAlt, FaArrowRight } from "react-icons/fa";
 
+
+
 const CoverPage = ({ onGetStarted }) => {
   return (
     <section className="min-h-screen flex flex-col justify-between items-center text-center bg-background text-foreground p-6 relative overflow-hidden transition-colors duration-500">
