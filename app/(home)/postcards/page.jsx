@@ -273,7 +273,7 @@ export default function PostCard({ post, userData, userName, avatar }) {
                   alt="avatar"
                   className="w-8 h-8 rounded-full mr-2"
                 />
-                <div className="bg-gray-100 p-2 rounded-lg flex-1">
+                <div className="bg-background p-2 rounded-lg flex-1">
                   <p className="text-sm font-semibold">{c.userName}</p>
                   <p className="text-sm">{c.text}</p>
                   <p className="text-xs text-gray-400">
@@ -322,7 +322,7 @@ export default function PostCard({ post, userData, userName, avatar }) {
                         alt="avatar"
                         className="w-6 h-6 rounded-full mr-2"
                       />
-                      <div className="bg-gray-200 p-2 rounded-lg flex-1">
+                      <div className="bg-background p-2 rounded-lg flex-1">
                         <p className="text-sm font-semibold">{r.userName}</p>
                         <p className="text-sm">{r.text}</p>
                         <p className="text-xs text-gray-400">
