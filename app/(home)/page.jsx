@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import PostCard from "./postcards/page";
+import { toast } from "sonner";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
@@ -48,7 +49,7 @@ export default function Feed() {
 
   // Create new post
   const handleCreatePost = async () => {
-    if (!newPostText.trim()) return alert("Please enter some text.");
+    if (!newPostText.trim()) return toast("Please enter some text.");
     setLoading(true);
     try {
       const res = await axios.post(`${BACKEND_URL}/posts`, {

@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LogIn, Upload } from "lucide-react";
-import { useAlertDialog } from "@/components/hooks/use-alert-dialog";
+import { LogIn } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function LoginForm({ mode = "login" }) {
   const router = useRouter();
@@ -37,8 +37,6 @@ export default function LoginForm({ mode = "login" }) {
         ? { name: "", email: "", password: "", photoUrl: "" }
         : { email: "", password: "" },
   });
-
-  const { showAlert, AlertDialogUI } = useAlertDialog();
 
   // --- Handle file selection ---
   const handleFileChange = (e) => {
@@ -69,6 +67,7 @@ export default function LoginForm({ mode = "login" }) {
         form.setValue("photoUrl", data.secure_url);
       }
     } catch (err) {
+      toast.error("Cloudinary upload failed");
       console.error("Cloudinary upload error:", err);
     } finally {
       setUploading(false);
@@ -85,18 +84,11 @@ export default function LoginForm({ mode = "login" }) {
       });
 
       if (res?.error) {
-        showAlert({
-          title: "Login Failed",
+        toast.error("LogIn failed", {
           description: "Invalid email or password",
-          confirmText: "Try Again",
-        });
+        })
       } else {
-        showAlert({
-          title: "Logged in!",
-          description: `Welcome back, ${values.email}`,
-          confirmText: "Go Home",
-          onConfirm: () => router.push("/"),
-        });
+        toast.success("Logged in successfully");
       }
     } else {
       // --- Signup ---
@@ -118,32 +110,26 @@ export default function LoginForm({ mode = "login" }) {
           });
 
           if (loginRes?.error) {
-            showAlert({
-              title: "Account Created!",
-              description: "Please login manually",
-              confirmText: "Go to Login",
-              onConfirm: () => router.push("/login"),
+            toast.success("Account created!", {
+              description: "Please login",
+              action: { label: "Go to Login", onClick: () => router.push("/login") }
             });
           } else {
-            showAlert({
-              title: "Account Created!",
+            toast.success("Account created!", {
               description: "You are now logged in.",
-              confirmText: "Go Home",
-              onConfirm: () => router.push("/"),
+              action: { label: "Go Home", onClick: () => router.push("/") }
             });
           }
         } else {
-          showAlert({
-            title: "Signup Failed",
+          toast.error("Signup Failed", {
             description: data.error || "Something went wrong",
-            confirmText: "Try Again",
+            action: { label: "Try Again", onClick: () => router.push("/signup") }
           });
         }
       } catch (err) {
-        showAlert({
-          title: "Signup Failed",
+        toast.error("Signup Failed", {
           description: "Something went wrong",
-          confirmText: "Try Again",
+          action: { label: "Try Again", onClick: () => router.push("/signup") }
         });
       }
     }
@@ -220,21 +206,19 @@ export default function LoginForm({ mode = "login" }) {
           </div>
         )}
 
-        <Button type="submit" className="w-full py-2">
+        <Button type="submit" className="w-full py-2 cursor-pointer">
           {mode === "login" ? "Sign In" : "Register"}
         </Button>
 
         <Button
           type="button"
           variant="outline"
-          className="w-full flex items-center justify-center gap-2 mt-2 py-2"
+          className="w-full cursor-pointer flex items-center justify-center gap-2 mt-2 py-2"
           onClick={handleGoogleLogin}
         >
           <LogIn className="w-5 h-5" /> Continue with Google
         </Button>
       </form>
-
-      {AlertDialogUI}
     </>
   );
 }
