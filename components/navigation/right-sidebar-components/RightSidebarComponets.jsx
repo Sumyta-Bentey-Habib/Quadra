@@ -39,7 +39,7 @@ export default function RightSidebarComponents() {
     name ? name.split(" ").map((n) => n[0]).join("") : "?";
 
   return (
-    <div className="sticky top-0 w-80 border-l border-gray-200 p-6 max-xl:hidden overflow-x-hidden">
+    <div className="sticky top-0 w-full border-l max-xl:hidden overflow-x-hidden">
       <div className="space-y-6">
 
         {/* Suggested Users */}

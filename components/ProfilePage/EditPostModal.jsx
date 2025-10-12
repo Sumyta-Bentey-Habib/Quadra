@@ -16,7 +16,7 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) return alert("Please upload an image!");
+    if (!file.type.startsWith("image/")) return toast("Please upload an image!");
 
     const previewUrl = URL.createObjectURL(file);
     setPreviews((prev) => [...prev, previewUrl]);
@@ -65,7 +65,7 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
 
   // Update post
   const handleUpdate = async () => {
-    if (!text.trim()) return alert("Post text cannot be empty!");
+    if (!text.trim()) return toast("Post text cannot be empty!");
     setLoading(true);
 
     try {

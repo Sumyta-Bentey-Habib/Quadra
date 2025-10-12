@@ -4,10 +4,8 @@ import React from "react";
 import LoginForm from "@/components/forms/LoginForm";
 import Lottie from "lottie-react";
 import registerAnimation from "@/components/lottie/register.json";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogIn } from "lucide-react";
 import { ThemeToggler } from "@/components/Theme/ThemeToggler";
 
 export default function RegisterPage() {
@@ -36,15 +34,6 @@ export default function RegisterPage() {
                 Login
               </Link>
             </p>
-
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("/")}
-              className="text-sm flex items-center gap-1 w-full sm:w-auto justify-center"
-            >
-              <LogIn className="w-4 h-4" /> Home
-            </Button>
           </div>
         </div>
       </div>

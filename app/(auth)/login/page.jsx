@@ -25,8 +25,7 @@ export default function LoginPage() {
 
           {/* Links */}
           <div className="flex justify-center gap-4 mt-4 text-sm">
-            <Link href="/" className="text-blue-500 hover:underline">Return Home</Link>
-            <span className="text-gray-400">|</span>
+              Don&apos;t have an account?{" "}
             <Link href="/register" className="text-blue-500 hover:underline">Register</Link>
           </div>
         </div>
