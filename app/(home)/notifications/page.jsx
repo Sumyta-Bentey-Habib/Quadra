@@ -68,7 +68,7 @@ const NotificationsPage = () => {
 			const interval = setInterval(() => {
 				fetchNotifications(filter);
 				fetchUnreadCount();
-			}, 10000);
+			}, 30000);
 
 			return () => {
 				clearInterval(interval);
