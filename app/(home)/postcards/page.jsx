@@ -5,8 +5,8 @@ import axios from "axios";
 import { Heart, MessageCircle, Send, Bookmark, X } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import Likes from "@/components/ProfilePage/Likes";
-
-const BACKEND_URL = "http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
+import { cn } from "@/lib/utils";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function PostCard({ post, userData, userName, avatar }) {
   //console.log('userdata ',userData)

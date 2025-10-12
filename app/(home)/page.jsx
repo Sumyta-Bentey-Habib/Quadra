@@ -5,7 +5,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import PostCard from "./postcards/page";
 
-const BACKEND_URL = "http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
