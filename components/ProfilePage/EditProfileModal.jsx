@@ -78,7 +78,7 @@ const EditProfileModal = ({ user, setUpdateUi, updateUi }) => {
 
     // Update user info in backend
     try {
-      const res = await fetch(`http://localhost:5000/users/${user._id}`, {
+      const res = await fetch(`https://quadra-server.onrender.com/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, photoUrl, bio, twitter, linkedin, portfolio }),

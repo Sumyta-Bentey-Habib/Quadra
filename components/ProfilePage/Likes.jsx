@@ -1,9 +1,13 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { Heart, Laugh, Angry, ThumbsUp } from "lucide-react";
-
+import Lottie from "lottie-react";
+import Sad from "@/public/sad.json";
+import Love from "@/public/love.json";
+import Haha from "@/public/haha.json";
+import Like from "@/public/like.json";
 export default function Likes({ postId, currentUser }) {
-    // console.log("currentUser", currentUser);
+     
     
   const [reactions, setReactions] = useState([]);
   const [userReaction, setUserReaction] = useState(null);
@@ -13,21 +17,26 @@ export default function Likes({ postId, currentUser }) {
   const totalReactions = reactions.length;
 
   const reactionTypes = [
-    { type: "like", icon: <ThumbsUp size={22} />, color: "text-blue-500" },
-    { type: "love", icon: <Heart size={22} />, color: "text-red-500" },
-    { type: "haha", icon: <Laugh size={22} />, color: "text-yellow-400" },
-    { type: "angry", icon: <Angry size={22} />, color: "text-orange-500" },
+    { type: "like", icon: <Lottie animationData={Like} loop={true}   
+    style={{ width: 30, height: 30 }} />, color: "text-blue-500" },
+    { type: "love", icon:<Lottie animationData={Love} loop={true}   
+    style={{ width: 30, height: 30 }} />, color: "text-red-500" },
+    { type: "haha", icon: <Lottie animationData={Haha} loop={true}   
+    style={{ width: 30, height: 30 }} />, color: "text-yellow-400" },
+    { type: "angry", icon:   <Lottie animationData={Sad} loop={true}   
+    style={{ width: 30, height: 30 }} />,
+     color: "text-orange-500" },
   ];
 
   // Fetch post reactions
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/posts/?postId=${postId}`);
+        const res = await fetch(`https://quadra-server.onrender.com/posts/?postId=${postId}`);
         const data = await res.json();
         setReactions(data.likes || []);
 
-        const userLike = data.likes.find((l) => l.userId === currentUser._id);
+        const userLike = data.likes.find((l) => l.userId === currentUser._id );
         if (userLike) setUserReaction(userLike.reaction);
       } catch (error) {
         console.error("Failed to fetch likes:", error);
@@ -55,13 +64,13 @@ export default function Likes({ postId, currentUser }) {
     const newReaction = userReaction === reactionType ? null : reactionType;
 
     try {
-      const res = await fetch(`http://localhost:5000/posts/${postId}/like`, {
+      const res = await fetch(`https://quadra-server.onrender.com/posts/${postId}/like`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: currentUser._id,
-          userName: currentUser.name,
-          avatar: currentUser.photoUrl, 
+          userName: currentUser.name ,
+          avatar: currentUser.photoUrl ,
           reaction: newReaction,      
         }),
       });
@@ -94,11 +103,16 @@ export default function Likes({ postId, currentUser }) {
         >
           
           <span className="text-sm  flex items-center justify-center gap-1">
-            { !userReaction && <> <ThumbsUp size={20} /> Like </>}
-            { userReaction == "like" && <ThumbsUp className="text-blue-600" size={22} />}
-            { userReaction == "love" && <Heart className="text-red-600" size={22} />}
-            { userReaction == "haha" && <Laugh className="text-yellow-500" size={22} />}
-            { userReaction == "angry" && <Angry className="text-orange-600" size={22} />}
+            { !userReaction && <> <Lottie animationData={Like} loop={true}   
+    style={{ width: 30, height: 30 }} />Like </>}
+            { userReaction == "like" && <Lottie animationData={Like} loop={true}   
+    style={{ width: 30, height: 30 }} />}
+            { userReaction == "love" && <Lottie animationData={Love} loop={true}   
+    style={{ width: 30, height: 30 }} />}
+            { userReaction == "haha" && <Lottie animationData={Haha} loop={true}   
+    style={{ width: 30, height: 30 }} />}
+            { userReaction == "angry" && <Lottie animationData={Sad} loop={true}   
+    style={{ width: 30, height: 30 }} />}
           </span>
       
         <div className="text-xs text-gray-500">  

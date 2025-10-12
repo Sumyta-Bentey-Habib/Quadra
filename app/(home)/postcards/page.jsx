@@ -4,27 +4,29 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Heart, MessageCircle, Send, Bookmark, X } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import Likes from "@/components/ProfilePage/Likes";
 import { cn } from "@/lib/utils";
-
-const BACKEND_URL = "http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function PostCard({ post, userData, userName, avatar }) {
-	// Bookmark & alerts
-	const [bookmarked, setBookmarked] = useState(false);
-	const [bookmarkLoading, setBookmarkLoading] = useState(false);
-	const [alert, setAlert] = useState({ type: "", message: "" });
+  //console.log('userdata ',userData)
+  // Bookmark & alerts
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [alert, setAlert] = useState({ type: "", message: "" });
 
 	// Images
 	const [showAllImages, setShowAllImages] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalIndex, setModalIndex] = useState(0);
 
-	// Comments
-	const [commentsVisible, setCommentsVisible] = useState(false);
-	const [comments, setComments] = useState(post.comments || []);
-	const [commentText, setCommentText] = useState("");
-	const [showReplyInput, setShowReplyInput] = useState({});
-	const [replyText, setReplyText] = useState({});
+  // Comments
+  const [commentsVisible, setCommentsVisible] = useState(false);
+  const [comments, setComments] = useState(post.comments || []);
+  const [commentText, setCommentText] = useState("");
+  const [showReplyInput, setShowReplyInput] = useState({});
+  const [replyText, setReplyText] = useState({});
+  const  currentUser = userData;
 
 	useEffect(() => {
 		if (!userData?.bookmarks) return;
@@ -187,31 +189,36 @@ export default function PostCard({ post, userData, userName, avatar }) {
 				</div>
 			)}
 
-			{/* Post Actions */}
-			<div className='flex items-center justify-between text-gray-600 mb-2'>
-				<button className='flex items-center space-x-1'>
-					<Heart className='w-5 h-5' /> <span>{post.likes?.length || 0}</span>
-				</button>
-				<button
-					onClick={() => (commentsVisible ? setCommentsVisible(false) : fetchComments())}
-					className='flex items-center space-x-1'
-				>
-					<MessageCircle className='w-5 h-5' /> <span>{comments?.length || 0}</span>
-				</button>
-				<button className='flex items-center space-x-1'>
-					<Send className='w-5 h-5' /> <span>Share</span>
-				</button>
-				{userData?._id && (
-					<button
-						onClick={handleToggleBookmark}
-						disabled={bookmarkLoading}
-						className='flex items-center space-x-1'
-					>
-						<Bookmark className={`w-5 h-5 ${bookmarked ? "text-blue-600 fill-blue-600" : ""}`} />
-						<span>{bookmarked ? "Bookmarked" : "Bookmark"}</span>
-					</button>
-				)}
-			</div>
+      {/* Post Actions */}
+      <div className="flex items-center justify-between text-gray-600 mb-2">
+        <Likes postId={post?._id}  currentUser = {currentUser} />
+        {/* <button className="flex items-center space-x-1">
+          <Heart className="w-5 h-5" /> <span>{post.likes?.length || 0}</span>
+        </button> */}
+        <button
+          onClick={() =>
+            commentsVisible ? setCommentsVisible(false) : fetchComments()
+          }
+          className="flex items-center space-x-1"
+        >
+          <MessageCircle className="w-5 h-5" /> <span>{comments?.length || 0}</span>
+        </button>
+        <button className="flex items-center space-x-1">
+          <Send className="w-5 h-5" /> <span>Share</span>
+        </button>
+        {userData?._id && (
+          <button
+            onClick={handleToggleBookmark}
+            disabled={bookmarkLoading}
+            className="flex items-center space-x-1"
+          >
+            <Bookmark
+              className={`w-5 h-5 ${bookmarked ? "text-blue-600 fill-blue-600" : ""}`}
+            />
+            <span>{bookmarked ? "Bookmarked" : "Bookmark"}</span>
+          </button>
+        )}
+      </div>
 
 			{/* Comments Section */}
 			{commentsVisible && (

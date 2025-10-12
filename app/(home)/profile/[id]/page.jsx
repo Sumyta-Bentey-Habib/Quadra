@@ -25,7 +25,7 @@ const ProfilePage = () => {
 		const fetchPosts = async () => {
 			if (!userId) return;
 			try {
-				const res = await fetch(`http://localhost:5000/posts?userId=${userId}`);
+				const res = await fetch(`https://quadra-server.onrender.com/posts?userId=${userId}`);
 				const data = await res.json();
 				setPosts(data);
 			} catch (error) {

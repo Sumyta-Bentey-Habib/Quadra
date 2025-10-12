@@ -3,6 +3,8 @@ import React from "react";
 import { TypeAnimation } from "react-type-animation";
 import { FaComments, FaHeart, FaShareAlt, FaArrowRight } from "react-icons/fa";
 
+
+
 const CoverPage = ({ onGetStarted }) => {
   return (
     <section className="min-h-screen flex flex-col justify-between items-center text-center bg-background text-foreground p-6 relative overflow-hidden transition-colors duration-500">
@@ -45,7 +47,7 @@ const CoverPage = ({ onGetStarted }) => {
           onClick={onGetStarted}
           className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-full font-medium text-lg transition-all shadow-sm"
         >
-          Get Started <FaArrowRight />
+          Join the journey <FaArrowRight />
         </button>
 
         <p className="text-sm text-muted-foreground">

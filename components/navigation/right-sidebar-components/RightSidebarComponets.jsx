@@ -13,8 +13,8 @@ export default function RightSidebarComponents() {
     async function fetchData() {
       try {
         const [usersRes, postsRes] = await Promise.all([
-          fetch("http://localhost:5000/users"),
-          fetch("http://localhost:5000/posts"),
+          fetch("https://quadra-server.onrender.com/users"),
+          fetch("https://quadra-server.onrender.com/posts"),
         ]);
         const usersData = await usersRes.json();
         const postsData = await postsRes.json();
