@@ -32,7 +32,7 @@ export default function Likes({ postId, currentUser }) {
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/posts/?postId=${postId}`);
+        const res = await fetch(`https://quadra-server.onrender.com/posts/?postId=${postId}`);
         const data = await res.json();
         setReactions(data.likes || []);
 
@@ -64,7 +64,7 @@ export default function Likes({ postId, currentUser }) {
     const newReaction = userReaction === reactionType ? null : reactionType;
 
     try {
-      const res = await fetch(`http://localhost:5000/posts/${postId}/like`, {
+      const res = await fetch(`https://quadra-server.onrender.com/posts/${postId}/like`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

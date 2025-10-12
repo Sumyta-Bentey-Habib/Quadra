@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import PostCard from "../postcards/page";
 import NoData from "@/components/nodata/NoData";
 
-const BACKEND_URL ="http://localhost:5000" || process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND_URL =process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 const BookmarksPage = () => {
   const { data: session } = useSession();
