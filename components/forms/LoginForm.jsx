@@ -14,7 +14,7 @@ import { toast } from "sonner";
 export default function LoginForm({ mode = "login" }) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null); // New: selected file
+  const [selectedFile, setSelectedFile] = useState(null); 
 
   // --- Form schema ---
   const formSchema =
@@ -89,6 +89,7 @@ export default function LoginForm({ mode = "login" }) {
         })
       } else {
         toast.success("Logged in successfully");
+        router.push("/");
       }
     } else {
       // --- Signup ---
@@ -117,8 +118,9 @@ export default function LoginForm({ mode = "login" }) {
           } else {
             toast.success("Account created!", {
               description: "You are now logged in.",
-              action: { label: "Go Home", onClick: () => router.push("/") }
+            
             });
+            router.push("/");
           }
         } else {
           toast.error("Signup Failed", {
