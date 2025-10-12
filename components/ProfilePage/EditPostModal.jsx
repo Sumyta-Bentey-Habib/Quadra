@@ -72,7 +72,7 @@ const EditPostModal = ({ post, onClose, onUpdate }) => {
       const uploadedUrls = await uploadNewFiles();
       const finalImages = [...existingImages, ...uploadedUrls];
 
-      const res = await fetch(`https://quadra-server.onrender.com/posts/${post._id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, images: finalImages }),
