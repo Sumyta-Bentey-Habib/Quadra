@@ -64,7 +64,7 @@ export default function Likes({ postId, currentUser }) {
     const newReaction = userReaction === reactionType ? null : reactionType;
 
     try {
-      const res = await fetch(`https://quadra-server.onrender.com/posts/${postId}/like`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${postId}/like`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -11,7 +11,7 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 export default function PostCard({ post, userData, userName, avatar }) {
-  // ✅ handle missing props early (avoids prerender crash)
+  //  handle missing props early (avoids prerender crash)
   if (!post || !userData) {
     return null;
   }
@@ -273,7 +273,7 @@ export default function PostCard({ post, userData, userName, avatar }) {
                   alt="avatar"
                   className="w-8 h-8 rounded-full mr-2"
                 />
-                <div className="bg-background p-2 rounded-lg flex-1">
+                <div className="bg-background p-2 rounded-lg flex-1 border">
                   <p className="text-sm font-semibold">{c.userName}</p>
                   <p className="text-sm">{c.text}</p>
                   <p className="text-xs text-gray-400">
