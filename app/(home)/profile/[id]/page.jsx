@@ -101,7 +101,7 @@ const ProfilePage = () => {
 									/>
 								</div>
 								<h1 className='text-2xl sm:text-3xl font-serif font-bold'>{user.name}</h1>
-								<p className='text-sm sm:text-md text-gray-500 dark:text-gray-400 font-mono mt-1'>{user.email}</p>
+								<p className='text-sm sm:text-sm text-gray-500 dark:text-gray-400 font-mono mt-1'>{user.email}</p>
 
 								{/* Bio */}
 								{user.bio && (
