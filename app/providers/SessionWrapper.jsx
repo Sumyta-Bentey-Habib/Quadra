@@ -17,9 +17,9 @@ const SocketHandler = () => {
 
 	useEffect(() => {
 		if (session?.user?.id) {
-			console.log("Connecting to socket and emitting userOnline event");
+			console.log("Connecting to socket and emitting authenticate event");
 			socket.connect();
-			socket.emit("userOnline", session.user.id);
+			socket.emit("authenticate", session.user.id);
 		}
 
 		return () => {
