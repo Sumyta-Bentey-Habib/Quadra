@@ -55,7 +55,8 @@ export default function Feed() {
         text: newPostText,
         userId: userData?._id,
         userName: userName || "Anonymous",
-        avatar: avatar || "https://i.pravatar.cc/100",
+        avatar: avatar || "https://i.pravatar.cc/100" || userData.photoUrl
+,
         images: [],
       });
       setPosts([res.data, ...posts]);
