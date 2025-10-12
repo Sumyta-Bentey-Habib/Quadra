@@ -31,7 +31,10 @@ const NotificationsPage = () => {
 			const response = await fetch(url);
 			if (response.ok) {
 				const data = await response.json();
+				console.log("Fetched notifications:", data);
 				setNotifications(data);
+			} else {
+				console.error("Failed to fetch notifications:", response.status, response.statusText);
 			}
 		} catch (error) {
 			console.error("Failed to fetch notifications:", error);
@@ -61,22 +64,17 @@ const NotificationsPage = () => {
 			fetchNotifications(filter);
 			fetchUnreadCount();
 
-			// Connect to socket for real-time updates
-			socket.connect();
-			socket.emit("authenticate", session.user.id);
-
-			// Listen for new notifications
-			socket.on("newNotification", (notification) => {
-				setNotifications((prev) => [notification, ...prev]);
-				setUnreadCount((prev) => prev + 1);
-			});
+			// Set up polling to check for new notifications every 10 seconds
+			const interval = setInterval(() => {
+				fetchNotifications(filter);
+				fetchUnreadCount();
+			}, 10000);
 
 			return () => {
-				socket.off("newNotification");
-				socket.disconnect();
+				clearInterval(interval);
 			};
 		}
-	}, [session?.user?.id]);
+	}, [session?.user?.id, filter]);
 
 	// Handle filter changes
 	useEffect(() => {
