@@ -1,23 +1,3 @@
-/**
- * MessageList Component - Main Chat Interface
- *
- * This is the core component that displays all messages in a conversation.
- * Handles real-time message updates, message editing, deletion, and status tracking.
- *
- * Key Features:
- * - Real-time message updates via Socket.io
- * - Message status indicators (sent, delivered, read)
- * - Message editing and deletion functionality
- * - Auto-scroll to latest messages
- * - Responsive message layout (own vs others' messages)
- *
- * Socket Events Handled:
- * - newMessage: New messages from other users
- * - messageDeleted: When messages are deleted
- * - messageEdited: When messages are edited
- * - messageStatusUpdated: Real-time status updates
- */
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -168,7 +148,7 @@ export default function MessageList({ messages: initialMessages, currentUserId, 
 						>
 							{!isOwn && (
 								<Avatar className='mr-2'>
-									<AvatarImage src={msg.sender?.imageUrl} />
+									<AvatarImage src={msg.sender?.photoUrl} />
 									<AvatarFallback>{msg.sender?.name?.[0]}</AvatarFallback>
 								</Avatar>
 							)}
@@ -214,7 +194,7 @@ export default function MessageList({ messages: initialMessages, currentUserId, 
 							)}
 							{isOwn && (
 								<Avatar className='ml-2'>
-									<AvatarImage src={user?.imageUrl} />
+									<AvatarImage src={user?.photoUrl} />
 									<AvatarFallback>{user?.name[0]}</AvatarFallback>
 								</Avatar>
 							)}
